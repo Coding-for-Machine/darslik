@@ -12,7 +12,7 @@
 
   <!-- CSS fayllar -->
   <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
-  <link rel="stylesheet" href="{% static 'assets/css/dars.css' %}">
+
 
 
   <!-- Google Fonts -->
@@ -24,7 +24,7 @@
   <link rel="preload" as="image" href="{% static 'assets/images/hero-banner.png' %}">
   <link rel="preload" as="image" href="{% static 'assets/images/hero-abs-1.png' %}" media="min-width(768px)">
   <link rel="preload" as="image" href="{% static 'assets/images/hero-abs-2.png' %}" media="min-width(768px)">
-
+  {% block extra_css %}{% endblock %}
 </head>
 
 <body id="top">
@@ -38,6 +38,10 @@
 
   {% include 'footer.html' %}
 
+
+  {% block extra_js %}
+
+  {% endblock %}
   <!-- Back to top tugmasi -->
   <a href="#top" class="back-top-btn" aria-label="Yuqoriga qaytish" data-back-top-btn>
     <ion-icon name="arrow-up"></ion-icon>

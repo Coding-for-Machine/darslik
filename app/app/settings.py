@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "corsheaders",
+    'ckeditor',
+    'ckeditor_uploader',
     "course",
     "lesson",
     "users"
@@ -109,21 +111,27 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', 'letcode'),
-        'USER': config('DB_USER', 'leetcde_owner'),
-        'PASSWORD': config('DB_PASSWORD', 'npg_Wzf0CyF2KSmb'),
-        'HOST': config('DB_HOST', 'estless-hat-a5vszu.neon.tech'),
-        'PORT': config('DB_PORT', '5432'),
-        'OPTIONS': {
-            'sslmode': 'require',
-            'connect_timeout': 5,  # 5 sekunddan keyin timeout
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DB_NAME', 'letcode'),
+#         'USER': config('DB_USER', 'leetcde_owner'),
+#         'PASSWORD': config('DB_PASSWORD', 'npg_Wzf0CyF2KSmb'),
+#         'HOST': config('DB_HOST', 'estless-hat-a5vszu.neon.tech'),
+#         'PORT': config('DB_PORT', '5432'),
+#         'OPTIONS': {
+#             'sslmode': 'require',
+#             'connect_timeout': 5,  # 5 sekunddan keyin timeout
+#         }
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -183,7 +191,35 @@ STATICFILES_DIRS = [
 ]
 
 
-# Default primary key field type
+# CKEditor konfiguratsiyasi
+CKEDITOR_UPLOAD_PATH = "uploads/"  # Yuklanadigan fayllar joylashuvi (MEDIA_ROOT ichida)
+CKEDITOR_IMAGE_BACKEND = "pillow"  # Rasm ishlovchi
+CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js' 
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'extraPlugins': ','.join([
+            'uploadimage',  # Rasm yuklash
+            'uploadwidget',  # Boshqa fayllar uchun
+            'filebrowser'    # Fayl brauzeri
+        ]),
+        'filebrowserUploadUrl': '/ckeditor/upload/',  # Yuklash URL
+        'filebrowserBrowseUrl': '/ckeditor/browse/',  # Ko'rish URL
+    },
+}
+
+# Barcha fayl turlarini yuklashga ruxsat berish
+CKEDITOR_ALLOW_NONIMAGE_FILES = True  # Muhim!
+
+# Ruxsat berilgan fayl formatlari
+CKEDITOR_UPLOAD_FILE_TYPES = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'rar', 'txt']
+CKEDITOR_RESTRICT_BY_DATE = True 
+# Fayl yuklash uchun URL
+CKEDITOR_UPLOAD_SLUGIFY_FILENAME = True
+CKEDITOR_RESTRICT_BY_USER = True  # Fayllarni foydalanuvchi bo'yicha cheklash
+CKEDITOR_BROWSE_SHOW_DIRS = True  # Papkalarni ko'rish
+
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

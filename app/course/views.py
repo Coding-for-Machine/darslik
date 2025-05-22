@@ -11,9 +11,6 @@ def home(request):
 
 def lesson(request, slug):
     try:
-        course = Course.objects.get(slug=slug)
-        bobs = course.bob.all()
-        return render(request, "page/sidbar.html", {"course": course, "bobs": bobs})
-    
+        return render(request, "page/sidbar.html", {})
     except Course.DoesNotExist as e:
         raise Http404("Topilmadi")

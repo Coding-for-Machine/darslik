@@ -1,163 +1,1118 @@
 <!DOCTYPE html>
-{% load static %}
-<html lang="en">
+<html lang="uz">
 <head>
-	<meta charset="UTF-8">
-	<title>Side Navigation Bar</title>
-	<link rel="stylesheet" href="{% static 'assets/css/dars.css' %}">
-	<script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-	<script>
-		$(document).ready(function(){
-			$(".hamburger").click(function(){
-			  $(".wrapper").toggleClass("active")
-			})
-		});
-	</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darslik Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    <style>
+        .lesson-content {
+            line-height: 1.8;
+        }
+        .lesson-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 16px 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .lesson-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .lesson-content table td {
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        .lesson-content table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        .lesson-content h1, .lesson-content h2, .lesson-content h3 {
+            font-weight: bold;
+            margin: 24px 0 16px 0;
+            color: #1f2937;
+        }
+        .lesson-content h1 { font-size: 2rem; }
+        .lesson-content h2 { font-size: 1.5rem; }
+        .lesson-content h3 { font-size: 1.25rem; }
+        .lesson-content p {
+            margin: 12px 0;
+            color: #374151;
+        }
+        .lesson-content a {
+            color: #3b82f6;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+        .lesson-content a:hover {
+            color: #1d4ed8;
+        }
+        .lesson-content blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 16px;
+            margin: 16px 0;
+            font-style: italic;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+        }
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .dropdown-arrow {
+            transition: transform 0.2s ease-in-out;
+        }
+        .dropdown-arrow.rotate {
+            transform: rotate(180deg);
+        }
+        .sidebar-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-track {
+            background: #374151;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-thumb {
+            background: #6b7280;
+            border-radius: 2px;
+        }
+        .content-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+        }
+        .bookmark-btn {
+            transition: all 0.2s ease;
+        }
+        .bookmark-btn.bookmarked {
+            color: #f59e0b;
+        }
+        .notes-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .notes-panel.open {
+            max-height: 200px;
+        }
+        .theme-toggle {
+            transition: background-color 0.3s ease;
+        }
+        .fullscreen-reading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+    </style>
 </head>
-  <body class="bg-gray-100">
-      <div class="flex h-screen">
-          <!-- Sidebar -->
-          <aside class="w-64 bg-gray-900 text-white">
-              <div class="p-4 border-b border-gray-800">
-                  <div class="flex items-center justify-between">
-                      <img src="https://tailwindflex.com/images/logo.svg" alt="Logo" class="h-8 w-auto">
-                      <span class="text-xl font-bold">Admin Pro</span>
-                  </div>
-              </div>
-  
-              <!-- Search Bar -->
-              <div class="p-4">
-                  <div class="relative">
-                      <input type="text" class="w-full bg-gray-800 text-white rounded-md pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Search...">
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <svg class="h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                          </svg>
-                      </div>
-                  </div>
-              </div>
-  
-              <nav class="mt-5 px-2">
-                  <!-- Main Navigation -->
-                  <div class="space-y-4">
-                      <!-- Dashboard -->
-                      <a href="#" class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg bg-gray-800 text-white group transition-all duration-200 hover:bg-gray-700">
-                          <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                          </svg>
-                          Dashboard
-                      </a>
-  
-                      <!-- Analytics Dropdown -->
-                      <div class="space-y-1">
-                          <button class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none" aria-expanded="true" aria-controls="analytics-dropdown">
-                              <div class="flex items-center">
-                                  <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                  </svg>
-                                  Analytics
-                              </div>
-                              <svg class="ml-2 h-5 w-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                              </svg>
-                          </button>
-                          <div class="space-y-1 pl-11" id="analytics-dropdown">
-                            {% for bob in bobs %}
-                              <a href="#" class="group flex items-center px-4 py-2 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white">
-                                  {{bob.title}}
-                              </a>
-                            {% endfor %}
-                          </div>
-                      </div>
-  
-                      <!-- Team Dropdown -->
-                      <div class="space-y-1">
-                          <button class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none" aria-expanded="false" aria-controls="team-dropdown">
-                              <div class="flex items-center">
-                                  <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                  </svg>
-                                  Team
-                              </div>
-                              <svg class="ml-2 h-5 w-5 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                              </svg>
-                          </button>
-                          <div class="hidden space-y-1 pl-11" id="team-dropdown">
-                              <a href="#" class="group flex items-center px-4 py-2 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white">
-                                  Members
-                              </a>
-                              <a href="#" class="group flex items-center px-4 py-2 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white">
-                                  Calendar
-                              </a>
-                              <a href="#" class="group flex items-center px-4 py-2 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white">
-                                  Settings
-                              </a>
-                          </div>
-                      </div>
-  
-                      <!-- Projects -->
-                      <a href="#" class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white group transition-all duration-200">
-                          <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                          </svg>
-                          Projects
-                      </a>
-  
-                      <!-- Calendar -->
-                      <a href="#" class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white group transition-all duration-200">
-                          <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          Calendar
-                      </a>
-  
-                      <!-- Documents -->
-                      <a href="#" class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white group transition-all duration-200">
-                          <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          Documents
-                      </a>
-                  </div>
-              </nav>
-  
-              <!-- User Profile -->
-              <div class="mt-auto p-4 border-t border-gray-800">
-                  <div class="flex items-center">
-                      <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
-                      <div class="ml-3">
-                          <p class="text-sm font-medium text-white">Tom Cook</p>
-                          <p class="text-xs text-gray-400">View profile</p>
-                      </div>
-                  </div>
-              </div>
-          </aside>
-  
-          <!-- Main Content -->
-          <main class="flex-1 p-6 bg-gray-100">
-              <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
-              <div class="mt-4 p-6 bg-white rounded-lg shadow-md">
-                  <p class="text-gray-600">This is a dark sidebar example with submenus.</p>
-              </div>
-          </main>
-      </div>
-  
-      <script>
-          // Dropdown functionality
-          document.querySelectorAll('button[aria-controls]').forEach(button => {
-              button.addEventListener('click', () => {
-                  const isExpanded = button.getAttribute('aria-expanded') === 'true';
-                  const dropdownContent = document.getElementById(button.getAttribute('aria-controls'));
-                  
-                  button.setAttribute('aria-expanded', !isExpanded);
-                  dropdownContent.classList.toggle('hidden');
-                  button.querySelector('svg:last-child').classList.toggle('rotate-180');
-              });
-          });
-      </script>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 bg-gray-900 text-white p-2 rounded-lg">
+            <i class="fas fa-bars"></i>
+        </button>
 
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-gray-900 text-white sidebar-scrollbar overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out fixed lg:relative h-full z-40">
+            <div class="p-4 border-b border-gray-800">
+                <div class="flex items-center justify-between">
+                    <i class="fas fa-graduation-cap text-2xl text-indigo-400"></i>
+                    <span class="text-xl font-bold">Darslik Pro</span>
+                    <button id="close-sidebar" class="lg:hidden text-gray-400 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="p-4 bg-gray-800 m-4 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-400">Umumiy jarayon</span>
+                    <div class="relative w-8 h-8">
+                        <svg class="w-8 h-8 progress-ring">
+                            <circle cx="16" cy="16" r="14" fill="transparent" stroke="#374151" stroke-width="2"/>
+                            <circle id="progress-circle" cx="16" cy="16" r="14" fill="transparent" stroke="#3b82f6" stroke-width="2" 
+                                    stroke-dasharray="87.96" stroke-dashoffset="87.96" class="progress-ring-circle"/>
+                        </svg>
+                        <span id="progress-percent" class="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">0%</span>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-400">
+                    <span id="completed-lessons">0</span> / <span id="total-lessons">0</span> dars yakunlandi
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="p-4">
+                <div class="relative">
+                    <input type="text" id="search-input" class="w-full bg-gray-800 text-white rounded-md pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Qidirish...">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-500"></i>
+                    </div>
+                    <button id="clear-search" class="absolute inset-y-0 right-0 pr-3 hidden text-gray-500 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <nav class="mt-2 px-2">
+                <!-- Course Info -->
+                <div class="space-y-1" id="course-section">
+                    <button class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-lg bg-gray-800 text-white group transition-all duration-200 hover:bg-gray-700" aria-expanded="true" aria-controls="course-dropdown">
+                        <div class="flex items-center">
+                            <i class="fas fa-book mr-3"></i>
+                            <span id="course-title">Kurs yuklanyapti...</span>
+                        </div>
+                        <i class="fas fa-chevron-down dropdown-arrow rotate"></i>
+                    </button>
+                    <div class="space-y-1 pl-4" id="course-dropdown">
+                        <div id="course-info" class="p-3 text-xs text-gray-400 loading bg-gray-800 rounded">
+                            <div class="h-3 bg-gray-700 rounded mb-1"></div>
+                            <div class="h-3 bg-gray-700 rounded w-3/4 mb-1"></div>
+                            <div class="h-2 bg-gray-700 rounded w-1/2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chapters -->
+                <div class="space-y-1 mt-4">
+                    <button class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none transition-all duration-200" aria-expanded="false" aria-controls="chapters-dropdown">
+                        <div class="flex items-center">
+                            <i class="fas fa-list mr-3"></i>
+                            <span>Boblar</span>
+                            <span id="chapters-count" class="ml-2 px-2 py-0.5 bg-gray-700 text-xs rounded-full">0</span>
+                        </div>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </button>
+                    <div class="hidden space-y-1 pl-4" id="chapters-dropdown">
+                        <div id="chapters-list">
+                            <div class="loading space-y-2">
+                                <div class="h-8 bg-gray-800 rounded"></div>
+                                <div class="h-8 bg-gray-800 rounded"></div>
+                                <div class="h-8 bg-gray-800 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Lessons -->
+                <div class="space-y-1 mt-4" id="lessons-section" style="display: none;">
+                    <button class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none transition-all duration-200" aria-expanded="false" aria-controls="lessons-dropdown">
+                        <div class="flex items-center">
+                            <i class="fas fa-play-circle mr-3"></i>
+                            <span id="current-chapter-title">Darslar</span>
+                            <span id="lessons-count" class="ml-2 px-2 py-0.5 bg-gray-700 text-xs rounded-full">0</span>
+                        </div>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </button>
+                    <div class="hidden space-y-1 pl-4" id="lessons-dropdown">
+                        <div id="lessons-list"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mt-8 px-4">
+                    <div class="text-xs text-gray-400 mb-2 uppercase tracking-wide">Tez amallar</div>
+                    <div class="space-y-2">
+                        <button id="bookmark-btn" class="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-all duration-200">
+                            <i class="fas fa-bookmark mr-3"></i>
+                            Xatcho'plar
+                        </button>
+                        <button id="notes-btn" class="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-all duration-200">
+                            <i class="fas fa-sticky-note mr-3"></i>
+                            Eslatmalar
+                        </button>
+                        <button id="fullscreen-btn" class="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-all duration-200">
+                            <i class="fas fa-expand mr-3"></i>
+                            Toliq ekran
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- User Profile -->
+            <div class="mt-auto p-4 border-t border-gray-800">
+                <div class="flex items-center">
+                    <div class="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-white">O'quvchi</p>
+                        <p class="text-xs text-gray-400">Onlayn</p>
+                    </div>
+                    <button class="ml-auto text-gray-400 hover:text-white">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 bg-gray-100 flex flex-col lg:ml-0">
+            <!-- Header -->
+            <header class="bg-white shadow-sm border-b">
+                <div class="px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <h1 id="main-title" class="text-2xl font-semibold text-gray-900">Darslik Dashboard</h1>
+                            <div class="flex items-center mt-1 space-x-2">
+                                <p id="main-subtitle" class="text-gray-600">Darsni tanlang va o'rganishni boshlang</p>
+                                <div id="reading-time" class="hidden text-sm text-gray-500">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    <span>5 daqiqa</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <!-- Quick Tools -->
+                            <div class="hidden lg:flex items-center space-x-2">
+                                <button id="bookmark-current" class="tooltip bookmark-btn p-2 text-gray-600 hover:text-yellow-500 transition-colors" data-tooltip="Xatcho'pga qo'shish">
+                                    <i class="fas fa-bookmark"></i>
+                                </button>
+                                <button id="font-size-btn" class="tooltip p-2 text-gray-600 hover:text-gray-900 transition-colors" data-tooltip="Shrift o'lchami">
+                                    <i class="fas fa-text-height"></i>
+                                </button>
+                                <button id="print-btn" class="tooltip p-2 text-gray-600 hover:text-gray-900 transition-colors" data-tooltip="Chop etish">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Navigation -->
+                            <div class="flex items-center space-x-2">
+                                <button id="prev-lesson" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200" disabled>
+                                    <i class="fas fa-chevron-left mr-2"></i>
+                                    <span class="hidden sm:inline">Oldingi</span>
+                                </button>
+                                <span id="lesson-counter" class="px-3 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium">
+                                    0 / 0
+                                </span>
+                                <button id="next-lesson" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200" disabled>
+                                    <span class="hidden sm:inline">Keyingi</span>
+                                    <i class="fas fa-chevron-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Panel -->
+                <div id="notes-panel" class="notes-panel bg-yellow-50 border-t border-yellow-200">
+                    <div class="px-6 py-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-medium text-gray-900">Eslatmalar</h3>
+                            <button id="close-notes" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <textarea id="lesson-notes" class="w-full h-20 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Bu dars haqida eslatma yozing..."></textarea>
+                        <div class="flex justify-end mt-2">
+                            <button id="save-notes" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm">
+                                Saqlash
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto">
+                <div class="max-w-4xl mx-auto p-6">
+                    <div id="lesson-content" class="bg-white rounded-lg shadow-md">
+                        <div class="p-8">
+                            <div class="text-center py-16">
+                                <i class="fas fa-book-open text-6xl text-gray-300 mb-4"></i>
+                                <h3 class="text-xl font-medium text-gray-500 mb-2">Darslikka xush kelibsiz!</h3>
+                                <p class="text-gray-400 mb-6">Chap tarafdan bobni tanlang va o'rganishni boshlang</p>
+                                <div class="flex items-center justify-center space-x-4 text-sm text-gray-500">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-keyboard mr-2"></i>
+                                        <span>← → tugmalari bilan navigatsiya</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-search mr-2"></i>
+                                        <span>Qidirish imkoniyati</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Font Size Modal -->
+    <div id="font-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-80">
+            <h3 class="text-lg font-medium mb-4">Shrift sozlamalari</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">O'lcham:</label>
+                    <input type="range" id="font-range" min="12" max="24" value="16" class="w-full">
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Kichik</span>
+                        <span>Katta</span>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button id="reset-font" class="px-4 py-2 text-gray-600 hover:text-gray-800">Qaytarish</button>
+                    <button id="close-font-modal" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Yopish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
+
+    <script>
+        class AdvancedCourseApp {
+            constructor() {
+                this.baseURL = 'http://127.0.0.1:8000/api';
+                this.courseId = 1;
+                this.currentChapter = null;
+                this.currentLessonIndex = 0;
+                this.lessons = [];
+                this.chapters = [];
+                this.bookmarks = this.loadBookmarks();
+                this.notes = this.loadNotes();
+                this.completedLessons = this.loadProgress();
+                this.settings = this.loadSettings();
+                
+                this.init();
+            }
+
+            async init() {
+                await this.loadCourse();
+                await this.loadChapters();
+                this.setupEventListeners();
+                this.setupDropdowns();
+                this.setupMobileMenu();
+                this.setupKeyboardShortcuts();
+                this.setupAutoSave();
+                this.applySettings();
+            }
+
+            // Data Loading Methods
+            async loadCourse() {
+                try {
+                    const response = await fetch(`${this.baseURL}/courses/${this.courseId}`);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    
+                    const course = await response.json();
+                    
+                    document.getElementById('course-title').textContent = course.title;
+                    document.getElementById('course-info').innerHTML = `
+                        <div class="text-xs">
+                            <div class="text-gray-300 font-medium mb-2">${course.title}</div>
+                            <div class="text-gray-400 mb-2">📅 ${new Date(course.created_at).toLocaleDateString('uz-UZ')}</div>
+                            <div class="text-gray-400 text-xs leading-relaxed">${course.body}</div>
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error('Kursni yuklashda xatolik:', error);
+                    this.showError('Kursni yuklashda xatolik yuz berdi');
+                }
+            }
+
+            async loadChapters() {
+                try {
+                    const response = await fetch(`${this.baseURL}/courses/${this.courseId}/bobs`);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    
+                    const chapters = await response.json();
+                    this.chapters = chapters;
+                    
+                    document.getElementById('chapters-count').textContent = chapters.length;
+                    
+                    const chaptersHTML = chapters.map((chapter, index) => `
+                        <a href="#" 
+                           class="group flex items-center justify-between px-4 py-2.5 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white chapter-link transition-all duration-200"
+                           data-chapter-id="${chapter.id}">
+                            <div class="flex items-center">
+                                <i class="fas fa-circle text-xs mr-3 opacity-50"></i>
+                                <span>${index + 1}. ${chapter.title}</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                        </a>
+                    `).join('');
+                    
+                    document.getElementById('chapters-list').innerHTML = chaptersHTML;
+                } catch (error) {
+                    console.error('Boblarni yuklashda xatolik:', error);
+                    this.showError('Boblarni yuklashda xatolik yuz berdi');
+                }
+            }
+
+            async loadChapterLessons(chapterId) {
+                try {
+                    this.showLoadingSpinner();
+                    
+                    const response = await fetch(`${this.baseURL}/bobs/${chapterId}`);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    
+                    const chapterData = await response.json();
+                    
+                    this.currentChapter = chapterData;
+                    this.lessons = chapterData.lessons || [];
+                    this.currentLessonIndex = 0;
+                    
+                    this.updateUI(chapterData);
+                    this.generateLessonsList();
+                    this.updateActiveStates(chapterId);
+                    
+                    if (this.lessons.length > 0) {
+                        this.showLesson(0);
+                    }
+                    
+                    this.updateProgress();
+                    this.hideLoadingSpinner();
+                    
+                } catch (error) {
+                    console.error('Darslarni yuklashda xatolik:', error);
+                    this.showError('Darslarni yuklashda xatolik yuz berdi');
+                    this.hideLoadingSpinner();
+                }
+            }
+
+            // UI Update Methods
+            updateUI(chapterData) {
+                document.getElementById('main-title').textContent = chapterData.title;
+                document.getElementById('main-subtitle').textContent = `${this.lessons.length} ta dars mavjud`;
+                document.getElementById('current-chapter-title').textContent = chapterData.title;
+                document.getElementById('lessons-count').textContent = this.lessons.length;
+                document.getElementById('lessons-section').style.display = 'block';
+            }
+
+            generateLessonsList() {
+                const lessonsHTML = this.lessons.map((lesson, index) => {
+                    const isCompleted = this.completedLessons.includes(this.getLessonId(lesson, index));
+                    const hasBookmark = this.bookmarks.includes(this.getLessonId(lesson, index));
+                    const hasNotes = this.notes[this.getLessonId(lesson, index)];
+                    
+                    return `
+                        <a href="#" 
+                           class="group flex items-center justify-between px-4 py-2.5 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white lesson-link transition-all duration-200"
+                           data-lesson-index="${index}">
+                            <div class="flex items-center">
+                                <i class="fas fa-${isCompleted ? 'check-circle text-green-500' : 'play text-indigo-400'} text-xs mr-3"></i>
+                                <span>Dars ${index + 1}</span>
+                                <div class="flex items-center ml-2 space-x-1">
+                                    ${hasBookmark ? '<i class="fas fa-bookmark text-yellow-500 text-xs" title="Xatcho\'p"></i>' : ''}
+                                    ${hasNotes ? '<i class="fas fa-sticky-note text-blue-500 text-xs" title="Eslatma bor"></i>' : ''}
+                                </div>
+                            </div>
+                            <span class="text-xs opacity-50">${this.estimateReadingTime(lesson.body)} min</span>
+                        </a>
+                    `;
+                }).join('');
+                
+                document.getElementById('lessons-list').innerHTML = lessonsHTML;
+            }
+
+            showLesson(index) {
+                if (index < 0 || index >= this.lessons.length) return;
+                
+                const lesson = this.lessons[index];
+                this.currentLessonIndex = index;
+                const lessonId = this.getLessonId(lesson, index);
+                
+                // Mark as completed
+                if (!this.completedLessons.includes(lessonId)) {
+                    this.completedLessons.push(lessonId);
+                    this.saveProgress();
+                }
+                
+                // Prepare content
+                const readingTime = this.estimateReadingTime(lesson.body);
+                const isBookmarked = this.bookmarks.includes(lessonId);
+                
+                document.getElementById('lesson-content').innerHTML = `
+                    <div class="p-8 content-fade-in">
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                                        Dars ${index + 1}
+                                    </h2>
+                                    <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                        <span><i class="fas fa-clock mr-1"></i>${readingTime} daqiqa</span>
+                                        <span><i class="fas fa-calendar mr-1"></i>${new Date(lesson.created_at).toLocaleDateString('uz-UZ')}</span>
+                                        ${this.completedLessons.includes(lessonId) ? '<span class="text-green-600"><i class="fas fa-check-circle mr-1"></i>Yakunlangan</span>' : ''}
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+                                        ${this.currentChapter.title}
+                                    </span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
+                                        ${index + 1} / ${this.lessons.length}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="h-px bg-gray-200 mb-6"></div>
+                        </div>
+                        
+                        <div class="lesson-content prose max-w-none" style="font-size: ${this.settings.fontSize}px;">
+                            ${lesson.body}
+                        </div>
+                        
+                        <div class="mt-12 pt-8 border-t border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                    <span><i class="fas fa-calendar mr-1"></i>Yaratilgan: ${new Date(lesson.created_at).toLocaleDateString('uz-UZ')}</span>
+                                    <span><i class="fas fa-edit mr-1"></i>Yangilangan: ${new Date(lesson.updated_at).toLocaleDateString('uz-UZ')}</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="lesson-action-btn px-3 py-1 text-sm text-gray-600 hover:text-indigo-600 transition-colors" onclick="app.shareLesson()">
+                                        <i class="fas fa-share mr-1"></i>Ulashish
+                                    </button>
+                                    <button class="lesson-action-btn px-3 py-1 text-sm text-gray-600 hover:text-indigo-600 transition-colors" onclick="app.printLesson()">
+                                        <i class="fas fa-print mr-1"></i>Chop etish
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Update header info
+                document.getElementById('reading-time').classList.remove('hidden');
+                document.getElementById('reading-time').querySelector('span').textContent = `${readingTime} daqiqa`;
+                document.getElementById('lesson-counter').textContent = `${index + 1} / ${this.lessons.length}`;
+                
+                // Update bookmark button
+                const bookmarkBtn = document.getElementById('bookmark-current');
+                bookmarkBtn.classList.toggle('bookmarked', isBookmarked);
+                
+                // Load notes for this lesson
+                this.loadLessonNotes(lessonId);
+                
+                // Update active states
+                this.updateActiveLessonStates(index);
+                this.updateNavigationButtons();
+                this.updateProgress();
+                
+                // Auto-close mobile sidebar
+                this.closeMobileSidebar();
+                
+                // Scroll to top
+                document.querySelector('.flex-1.overflow-y-auto').scrollTop = 0;
+            }
+
+            // Utility Methods
+            estimateReadingTime(content) {
+                const wordsPerMinute = 200;
+                const textContent = content.replace(/<[^>]*>/g, '');
+                const wordCount = textContent.split(/\s+/).length;
+                return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+            }
+
+            getLessonId(lesson, index) {
+                return `${this.currentChapter.id}-${lesson.id || index}`;
+            }
+
+            updateActiveLessonStates(index) {
+                document.querySelectorAll('.lesson-link').forEach((link, i) => {
+                    link.classList.toggle('bg-indigo-600', i === index);
+                    link.classList.toggle('text-white', i === index);
+                    link.classList.toggle('text-gray-300', i !== index);
+                });
+            }
+
+            updateActiveStates(chapterId) {
+                document.querySelectorAll('.chapter-link').forEach(link => {
+                    const isActive = link.dataset.chapterId == chapterId;
+                    link.classList.toggle('bg-indigo-600', isActive);
+                    link.classList.toggle('text-white', isActive);
+                    link.classList.toggle('text-gray-300', !isActive);
+                });
+            }
+
+            updateNavigationButtons() {
+                const prevBtn = document.getElementById('prev-lesson');
+                const nextBtn = document.getElementById('next-lesson');
+                
+                prevBtn.disabled = this.currentLessonIndex === 0;
+                nextBtn.disabled = this.currentLessonIndex === this.lessons.length - 1;
+            }
+
+            updateProgress() {
+                const totalLessons = this.chapters.reduce((sum, chapter) => sum + (chapter.lessonCount || 0), this.lessons.length);
+                const completed = this.completedLessons.length;
+                const percentage = totalLessons > 0 ? Math.round((completed / totalLessons) * 100) : 0;
+                
+                // Update circular progress
+                const circle = document.getElementById('progress-circle');
+                const circumference = 2 * Math.PI * 14;
+                const offset = circumference - (percentage / 100) * circumference;
+                circle.style.strokeDashoffset = offset;
+                
+                // Update text
+                document.getElementById('progress-percent').textContent = `${percentage}%`;
+                document.getElementById('completed-lessons').textContent = completed;
+                document.getElementById('total-lessons').textContent = totalLessons;
+            }
+
+            // Event Listeners Setup
+            setupEventListeners() {
+                // Chapter and lesson navigation
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.chapter-link')) {
+                        e.preventDefault();
+                        const chapterId = e.target.closest('.chapter-link').dataset.chapterId;
+                        this.loadChapterLessons(parseInt(chapterId));
+                    }
+                    
+                    if (e.target.closest('.lesson-link')) {
+                        e.preventDefault();
+                        const lessonIndex = e.target.closest('.lesson-link').dataset.lessonIndex;
+                        this.showLesson(parseInt(lessonIndex));
+                    }
+                });
+                
+                // Navigation buttons
+                document.getElementById('prev-lesson').addEventListener('click', () => {
+                    if (this.currentLessonIndex > 0) {
+                        this.showLesson(this.currentLessonIndex - 1);
+                    }
+                });
+                
+                document.getElementById('next-lesson').addEventListener('click', () => {
+                    if (this.currentLessonIndex < this.lessons.length - 1) {
+                        this.showLesson(this.currentLessonIndex + 1);
+                    }
+                });
+                
+                // Search functionality
+                this.setupSearch();
+                
+                // Bookmark functionality
+                this.setupBookmarks();
+                
+                // Notes functionality
+                this.setupNotes();
+                
+                // Font size controls
+                this.setupFontControls();
+                
+                // Print functionality
+                document.getElementById('print-btn').addEventListener('click', () => this.printLesson());
+                
+                // Fullscreen functionality
+                document.getElementById('fullscreen-btn').addEventListener('click', () => this.toggleFullscreen());
+            }
+
+            setupSearch() {
+                const searchInput = document.getElementById('search-input');
+                const clearBtn = document.getElementById('clear-search');
+                
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    
+                    clearBtn.classList.toggle('hidden', !searchTerm);
+                    
+                    if (searchTerm) {
+                        this.performSearch(searchTerm);
+                    } else {
+                        this.clearSearch();
+                    }
+                });
+                
+                clearBtn.addEventListener('click', () => {
+                    searchInput.value = '';
+                    this.clearSearch();
+                    clearBtn.classList.add('hidden');
+                });
+            }
+
+            performSearch(term) {
+                document.querySelectorAll('.chapter-link, .lesson-link').forEach(link => {
+                    const text = link.textContent.toLowerCase();
+                    const matches = text.includes(term);
+                    link.style.display = matches ? 'flex' : 'none';
+                    
+                    if (matches) {
+                        link.style.backgroundColor = '#3b82f6';
+                        link.style.color = 'white';
+                    }
+                });
+            }
+
+            clearSearch() {
+                document.querySelectorAll('.chapter-link, .lesson-link').forEach(link => {
+                    link.style.display = 'flex';
+                    if (!link.classList.contains('bg-indigo-600')) {
+                        link.style.backgroundColor = '';
+                        link.style.color = '';
+                    }
+                });
+            }
+
+            setupBookmarks() {
+                document.getElementById('bookmark-current').addEventListener('click', () => {
+                    if (this.currentChapter && this.lessons.length > 0) {
+                        const lessonId = this.getLessonId(this.lessons[this.currentLessonIndex], this.currentLessonIndex);
+                        this.toggleBookmark(lessonId);
+                    }
+                });
+                
+                document.getElementById('bookmark-btn').addEventListener('click', () => {
+                    this.showBookmarks();
+                });
+            }
+
+            toggleBookmark(lessonId) {
+                const index = this.bookmarks.indexOf(lessonId);
+                const bookmarkBtn = document.getElementById('bookmark-current');
+                
+                if (index > -1) {
+                    this.bookmarks.splice(index, 1);
+                    bookmarkBtn.classList.remove('bookmarked');
+                } else {
+                    this.bookmarks.push(lessonId);
+                    bookmarkBtn.classList.add('bookmarked');
+                }
+                
+                this.saveBookmarks();
+                this.generateLessonsList(); // Refresh to show bookmark icons
+            }
+
+            setupNotes() {
+                document.getElementById('notes-btn').addEventListener('click', () => {
+                    this.toggleNotesPanel();
+                });
+                
+                document.getElementById('close-notes').addEventListener('click', () => {
+                    this.toggleNotesPanel(false);
+                });
+                
+                document.getElementById('save-notes').addEventListener('click', () => {
+                    this.saveLessonNotes();
+                });
+            }
+
+            toggleNotesPanel(show = null) {
+                const panel = document.getElementById('notes-panel');
+                const isOpen = show !== null ? show : !panel.classList.contains('open');
+                
+                panel.classList.toggle('open', isOpen);
+                
+                if (isOpen && this.currentChapter && this.lessons.length > 0) {
+                    const lessonId = this.getLessonId(this.lessons[this.currentLessonIndex], this.currentLessonIndex);
+                    this.loadLessonNotes(lessonId);
+                }
+            }
+
+            loadLessonNotes(lessonId) {
+                const notes = this.notes[lessonId] || '';
+                document.getElementById('lesson-notes').value = notes;
+            }
+
+            saveLessonNotes() {
+                if (this.currentChapter && this.lessons.length > 0) {
+                    const lessonId = this.getLessonId(this.lessons[this.currentLessonIndex], this.currentLessonIndex);
+                    const notesText = document.getElementById('lesson-notes').value;
+                    
+                    if (notesText.trim()) {
+                        this.notes[lessonId] = notesText;
+                    } else {
+                        delete this.notes[lessonId];
+                    }
+                    
+                    this.saveNotes();
+                    this.generateLessonsList(); // Refresh to show notes icons
+                    
+                    // Show success message
+                    this.showToast('Eslatma saqlandi', 'success');
+                }
+            }
+
+            setupFontControls() {
+                document.getElementById('font-size-btn').addEventListener('click', () => {
+                    document.getElementById('font-modal').classList.remove('hidden');
+                });
+                
+                document.getElementById('close-font-modal').addEventListener('click', () => {
+                    document.getElementById('font-modal').classList.add('hidden');
+                });
+                
+                document.getElementById('font-range').addEventListener('input', (e) => {
+                    const fontSize = e.target.value;
+                    this.settings.fontSize = fontSize;
+                    this.applyFontSize(fontSize);
+                    this.saveSettings();
+                });
+                
+                document.getElementById('reset-font').addEventListener('click', () => {
+                    this.settings.fontSize = 16;
+                    this.applyFontSize(16);
+                    document.getElementById('font-range').value = 16;
+                    this.saveSettings();
+                });
+            }
+
+            applyFontSize(size) {
+                const content = document.querySelector('.lesson-content');
+                if (content) {
+                    content.style.fontSize = `${size}px`;
+                }
+            }
+
+            // Mobile Menu Setup
+            setupMobileMenu() {
+                const mobileBtn = document.getElementById('mobile-menu-btn');
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                const closeBtn = document.getElementById('close-sidebar');
+                
+                mobileBtn.addEventListener('click', () => {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                });
+                
+                [closeBtn, overlay].forEach(el => {
+                    el.addEventListener('click', () => this.closeMobileSidebar());
+                });
+            }
+
+            closeMobileSidebar() {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebar-overlay').classList.add('hidden');
+            }
+
+            // Dropdown Setup
+            setupDropdowns() {
+                document.querySelectorAll('button[aria-controls]').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+                        const dropdownContent = document.getElementById(button.getAttribute('aria-controls'));
+                        const arrow = button.querySelector('.dropdown-arrow');
+                        
+                        button.setAttribute('aria-expanded', !isExpanded);
+                        dropdownContent.classList.toggle('hidden');
+                        if (arrow) arrow.classList.toggle('rotate');
+                    });
+                });
+            }
+
+            // Keyboard Shortcuts
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                    
+                    switch(e.key) {
+                        case 'ArrowLeft':
+                            if (!document.getElementById('prev-lesson').disabled) {
+                                this.showLesson(this.currentLessonIndex - 1);
+                            }
+                            break;
+                        case 'ArrowRight':
+                            if (!document.getElementById('next-lesson').disabled) {
+                                this.showLesson(this.currentLessonIndex + 1);
+                            }
+                            break;
+                        case 'b':
+                            if (e.ctrlKey || e.metaKey) {
+                                e.preventDefault();
+                                document.getElementById('bookmark-current').click();
+                            }
+                            break;
+                        case 'n':
+                            if (e.ctrlKey || e.metaKey) {
+                                e.preventDefault();
+                                this.toggleNotesPanel();
+                            }
+                            break;
+                        case 'f':
+                            if (e.ctrlKey || e.metaKey) {
+                                e.preventDefault();
+                                document.getElementById('search-input').focus();
+                            }
+                            break;
+                        case 'Escape':
+                            this.closeMobileSidebar();
+                            document.getElementById('font-modal').classList.add('hidden');
+                            this.toggleNotesPanel(false);
+                            break;
+                    }
+                });
+            }
+
+            // Auto-save Setup
+            setupAutoSave() {
+                setInterval(() => {
+                    const notesText = document.getElementById('lesson-notes').value;
+                    if (notesText && this.currentChapter && this.lessons.length > 0) {
+                        const lessonId = this.getLessonId(this.lessons[this.currentLessonIndex], this.currentLessonIndex);
+                        if (this.notes[lessonId] !== notesText) {
+                            this.saveLessonNotes();
+                        }
+                    }
+                }, 10000); // Auto-save every 10 seconds
+            }
+
+            // Additional Features
+            printLesson() {
+                const content = document.querySelector('.lesson-content').innerHTML;
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Dars ${this.currentLessonIndex + 1} - ${this.currentChapter.title}</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; margin: 40px; }
+                                img { max-width: 100%; height: auto; }
+                                table { width: 100%; border-collapse: collapse; }
+                                table td { padding: 8px; border: 1px solid #ddd; }
+                            </style>
+                        </head>
+                        <body>
+                            <h1>Dars ${this.currentLessonIndex + 1}</h1>
+                            <h2>${this.currentChapter.title}</h2>
+                            ${content}
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.print();
+            }
+
+            shareLesson() {
+                if (navigator.share) {
+                    navigator.share({
+                        title: `Dars ${this.currentLessonIndex + 1} - ${this.currentChapter.title}`,
+                        text: 'Bu darsni ko\'ring',
+                        url: window.location.href
+                    });
+                } else {
+                    // Fallback: copy to clipboard
+                    navigator.clipboard.writeText(window.location.href);
+                    this.showToast('Havola nusxalandi', 'success');
+                }
+            }
+
+            toggleFullscreen() {
+                const content = document.getElementById('lesson-content');
+                if (content.classList.contains('fullscreen-reading')) {
+                    content.classList.remove('fullscreen-reading');
+                } else {
+                    content.classList.add('fullscreen-reading');
+                }
+            }
+
+            // Local Storage Methods
+            loadBookmarks() {
+                return JSON.parse(localStorage.getItem('course_bookmarks')) || [];
+            }
+
+            saveBookmarks() {
+                localStorage.setItem('course_bookmarks', JSON.stringify(this.bookmarks));
+            }
+
+            loadNotes() {
+                return JSON.parse(localStorage.getItem('course_notes')) || {};
+            }
+
+            saveNotes() {
+                localStorage.setItem('course_notes', JSON.stringify(this.notes));
+            }
+
+            loadProgress() {
+                return JSON.parse(localStorage.getItem('course_progress')) || [];
+            }
+
+            saveProgress() {
+                localStorage.setItem('course_progress', JSON.stringify(this.completedLessons));
+            }
+
+            loadSettings() {
+                return JSON.parse(localStorage.getItem('course_settings')) || { fontSize: 16 };
+            }
+
+            saveSettings() {
+                localStorage.setItem('course_settings', JSON.stringify(this.settings));
+            }
+
+            applySettings() {
+                document.getElementById('font-range').value = this.settings.fontSize;
+                this.applyFontSize(this.settings.fontSize);
+            }
+
+            // Utility Methods
+            showLoadingSpinner() {
+                // Implementation for loading spinner
+            }
+
+            hideLoadingSpinner() {
+                // Implementation for hiding loading spinner
+            }
+
+            showError(message) {
+                this.showToast(message, 'error');
+            }
+
+            showToast(message, type = 'info') {
+                // Simple toast implementation
+                const toast = document.createElement('div');
+                toast.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white ${
+                    type === 'success' ? 'bg-green-500' : 
+                    type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+                }`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+
+            showBookmarks() {
+                // Implementation for showing bookmarks list
+                console.log('Bookmarks:', this.bookmarks);
+            }
+        }
+
+        // Initialize app
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new AdvancedCourseApp();
+        });
+    </script>
 </body>
 </html>

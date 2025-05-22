@@ -40,8 +40,9 @@ INSTALLED_APPS = [
     "corsheaders",
     'ckeditor',
     'ckeditor_uploader',
+    'ninja_jwt',
+    'ninja_extra',
     "course",
-    "lesson",
     "users"
 ]
 
@@ -53,6 +54,23 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
+
+from datetime import timedelta
+
+
+NINJA_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY, # Django SECRET_KEY dan foydalaning
+    "VERIFYING_KEY": None,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_AUTHENTICATION_RULE": "ninja_jwt.authentication.default_user_authentication_rule",
+    "USER_MODEL": "auth.User", # Agar o'zgartirgan bo'lsangiz, o'zingiznikini yozing
+}
+
 if DEBUG:
     INSTALLED_APPS.append("whitenoise.runserver_nostatic")
 
@@ -69,20 +87,20 @@ MIDDLEWARE = [
 ]
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', 'leetcode'),
-        'USER': config('DB_USER', 'leetcode_owner'),
-        'PASSWORD': config('DB_PASSWORD', 'npg_Wzf0CyF2KSmb'),
-        'HOST': config('DB_HOST', 'ep-restless-hat-a5vszuj5-pooler.us-east-2.aws.neon.tech'),
-        'PORT': config('DB_PORT', '5432'),
-        'OPTIONS': {
-            'sslmode': 'require',
-            'connect_timeout': 5,  # 5 sekunddan keyin timeout
-        }
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DB_NAME', 'leetcode'),
+#         'USER': config('DB_USER', 'leetcode_owner'),
+#         'PASSWORD': config('DB_PASSWORD', 'npg_Wzf0CyF2KSmb'),
+#         'HOST': config('DB_HOST', 'ep-restless-hat-a5vszuj5-pooler.us-east-2.aws.neon.tech'),
+#         'PORT': config('DB_PORT', '5432'),
+#         'OPTIONS': {
+#             'sslmode': 'require',
+#             'connect_timeout': 5,  # 5 sekunddan keyin timeout
+#         }
+#     }
+# }
 
 
 

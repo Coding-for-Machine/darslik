@@ -6,8 +6,8 @@ from course.api import api
 from users.urls import urlpatterns as users_urls
 
 urlpatterns = [
-    path("", include("course.urls")),
     path('admin/', admin.site.urls),
+    path("", include("course.urls")),
     path("api/", api.urls),
     path("ckeditor/", include("ckeditor_uploader.urls")),
     path("users/", include(users_urls)),

@@ -23,7 +23,7 @@ api = NinjaExtraAPI()
 # JWT autentifikatsiyasini ro'yxatdan o'tkazish
 api.register_controllers(NinjaJWTDefaultController)
 
-@api.post("/auth/register", response=UserSchema)
+@api.post("/auth/register/", response=UserSchema)
 def register(request, data: UserCreateSchema):
     """
     Foydalanuvchini ro'yxatdan o'tkazish.
@@ -46,7 +46,7 @@ def register(request, data: UserCreateSchema):
 
 # --- Kurslar bo'yicha endpointlar ---
 
-@api.get("/courses", response=List[CourseSchema], auth=JWTAuth())
+@api.get("/courses/", response=List[CourseSchema], auth=JWTAuth())
 def list_courses(request):
     """
     Barcha faol kurslar ro'yxatini qaytaradi.
@@ -67,7 +67,7 @@ def list_courses(request):
 
     return courses
 
-@api.get("/courses/{course_id}", response=CourseSchema, auth=JWTAuth())
+@api.get("/courses/{course_id}/", response=CourseSchema, auth=JWTAuth())
 def get_course(request, course_id: int):
     """
     Berilgan ID bo'yicha bitta kurs ma'lumotlarini qaytaradi.
@@ -86,7 +86,7 @@ def get_course(request, course_id: int):
 
     return course
 
-@api.get("/courses/{course_id}/bobs", response=List[BobSchema], auth=JWTAuth())
+@api.get("/courses/{course_id}/bobs/", response=List[BobSchema], auth=JWTAuth())
 def get_course_bobs(request, course_id: int):
     """
     Berilgan kursga tegishli barcha faol boblar ro'yxatini qaytaradi.
@@ -99,7 +99,7 @@ def get_course_bobs(request, course_id: int):
     ).order_by('order')
     return bobs
 
-@api.get("/courses/{course_id}/detail", response=CourseDetailSchema, auth=JWTAuth())
+@api.get("/courses/{course_id}/detail/", response=CourseDetailSchema, auth=JWTAuth())
 def get_course_detail(request, course_id: int):
     """
     Kursning to'liq ma'lumotlarini, shu jumladan uning boblarini qaytaradi.
@@ -126,7 +126,7 @@ def get_course_detail(request, course_id: int):
 
 # --- Boblar bo'yicha endpointlar ---
 
-@api.get("/bobs/{bob_id}", response=BobDetailSchema, auth=JWTAuth())
+@api.get("/bobs/{bob_id}/", response=BobDetailSchema, auth=JWTAuth())
 def get_bob_detail(request, bob_id: int):
     """
     Berilgan ID bo'yicha bob va uning barcha faol darslarini qaytaradi.
@@ -161,7 +161,7 @@ def get_bob_detail(request, bob_id: int):
 
 # --- Darslar bo'yicha endpointlar ---
 
-@api.get("/lessons/{lesson_id}", response=LessonSchema, auth=JWTAuth())
+@api.get("/lessons/{lesson_id}/", response=LessonSchema, auth=JWTAuth())
 def get_lesson(request, lesson_id: int):
     """
     Berilgan ID bo'yicha bitta dars ma'lumotlarini qaytaradi.
@@ -190,7 +190,7 @@ def get_lesson(request, lesson_id: int):
 
 # --- Progress bo'yicha endpointlar ---
 
-@api.post("/progress/update", auth=JWTAuth())
+@api.post("/progress/update/", auth=JWTAuth())
 def update_progress(request, data: ProgressUpdateSchema):
     """
     Foydalanuvchining darsdagi jarayonini yangilash.
@@ -216,7 +216,7 @@ def update_progress(request, data: ProgressUpdateSchema):
 
     return {"success": True, "message": "Progress updated successfully"}
 
-@api.get("/progress/stats", auth=JWTAuth())
+@api.get("/progress/stats/", auth=JWTAuth())
 def get_progress_stats(request, course_id: Optional[int] = None):
     """
     Foydalanuvchining umumiy yoki ma'lum bir kurs bo'yicha jarayon statistikasi.
@@ -252,7 +252,7 @@ def get_progress_stats(request, course_id: Optional[int] = None):
 
 # --- Xatcho'plar bo'yicha endpointlar ---
 
-@api.post("/bookmarks/toggle", auth=JWTAuth())
+@api.post("/bookmarks/toggle/", auth=JWTAuth())
 def toggle_bookmark(request, data: BookmarkSchema):
     """
     Darsga xatcho'p qo'shish yoki olib tashlash.
@@ -271,7 +271,7 @@ def toggle_bookmark(request, data: BookmarkSchema):
 
     return {"success": True, "action": "added", "message": "Bookmark added successfully"}
 
-@api.get("/bookmarks", auth=JWTAuth(), response=List[LessonSchema])
+@api.get("/bookmarks/", auth=JWTAuth(), response=List[LessonSchema])
 def get_bookmarks(request):
     """
     Foydalanuvchining barcha xatcho'plarini (darslarini) qaytaradi.
@@ -296,7 +296,7 @@ def get_bookmarks(request):
 
 # --- Eslatmalar bo'yicha endpointlar ---
 
-@api.post("/notes", auth=JWTAuth(), response=NoteResponseSchema)
+@api.post("/notes/", auth=JWTAuth(), response=NoteResponseSchema)
 def create_note(request, data: NoteCreateSchema):
     """
     Dars uchun yangi eslatma yaratish yoki mavjudini yangilash.
@@ -311,7 +311,7 @@ def create_note(request, data: NoteCreateSchema):
 
     return note
 
-@api.get("/notes/{lesson_id}", auth=JWTAuth(), response=Optional[NoteResponseSchema])
+@api.get("/notes/{lesson_id}/", auth=JWTAuth(), response=Optional[NoteResponseSchema])
 def get_note(request, lesson_id: int):
     """
     Berilgan dars uchun foydalanuvchining eslatmasini qaytaradi.
@@ -323,7 +323,7 @@ def get_note(request, lesson_id: int):
     except Note.DoesNotExist:
         return None
 
-@api.put("/notes/{note_id}", auth=JWTAuth(), response=NoteResponseSchema)
+@api.put("/notes/{note_id}/", auth=JWTAuth(), response=NoteResponseSchema)
 def update_note(request, note_id: int, data: NoteUpdateSchema):
     """
     Mavjud eslatmani yangilash.
@@ -333,7 +333,7 @@ def update_note(request, note_id: int, data: NoteUpdateSchema):
     note.save()
     return note
 
-@api.delete("/notes/{note_id}", auth=JWTAuth())
+@api.delete("/notes/{note_id}/", auth=JWTAuth())
 def delete_note(request, note_id: int):
     """
     Eslatmani o'chirish.
@@ -342,7 +342,7 @@ def delete_note(request, note_id: int):
     note.delete()
     return {"success": True, "message": "Note deleted successfully"}
 
-@api.get("/notes", auth=JWTAuth(), response=List[NoteResponseSchema])
+@api.get("/notes/", auth=JWTAuth(), response=List[NoteResponseSchema])
 def get_user_notes(request):
     """
     Foydalanuvchining barcha eslatmalarini qaytaradi.
@@ -352,7 +352,7 @@ def get_user_notes(request):
 
 # --- Qidiruv endpointi ---
 
-@api.get("/search")
+@api.get("/search/", response=List[CourseSchema])
 def search(request, q: str = Query(..., min_length=2)):
     """
     Kurslar, boblar va darslar bo'yicha qidiruvni amalga oshiradi.

@@ -15,16 +15,12 @@ SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str, default=get_random_secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DJANGO_DEBUG", cast=bool, default=True)
 # DEBUG = True
-ALLOWED_HOSTS = [
-    "*",
-    ".railway.app",
-    "localhost",
-    "127.0.0.1",
-]
+ALLOWED_HOSTS = [".darslik.onrender.com", "localhost", "127.0.0.1"]  # in production
 CSRF_TRUSTED_ORIGINS = [
     "*"
-    "https://*.railway.app",
-    "http://0.0.0.0:8000",
+    "https://darslik.onrender.com",
+    "https://*.railway.app", 
+    "http://localhost:8000",
 ]
 
 if DEBUG:

@@ -15,12 +15,13 @@ SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str, default=get_random_secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DJANGO_DEBUG", cast=bool, default=True)
 # DEBUG = True
-ALLOWED_HOSTS = [".darslik.onrender.com", "localhost", "127.0.0.1"]  # in production
+ALLOWED_HOSTS = [".darslik.onrender.com", "localhost", "127.0.0.1", "0.0.0.0"]  # in production
 CSRF_TRUSTED_ORIGINS = [
-    "*"
     "https://darslik.onrender.com",
     "https://*.railway.app", 
     "http://localhost:8000",
+    "http://0.0.0.0:8000",
+
 ]
 
 if DEBUG:
@@ -242,11 +243,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-        "OPTIONS": {
-            "location": BASE_DIR / "media",  # media fayllar saqlanadigan papka
-            "base_url": "/media/",          # media fayllarga URL
-        },
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",

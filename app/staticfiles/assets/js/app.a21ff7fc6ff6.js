@@ -7,7 +7,7 @@ let courseStructure = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     // API Base URL
-    const API_BASE_URL = 'http://localhost:8000/api'; // O'zgartiring
+    const API_BASE_URL = `${document.location.origin}/api`; // O'zgartiring
     
     // DOM Elements
     const loadingSpinner = document.getElementById('loading-spinner');

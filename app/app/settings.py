@@ -13,11 +13,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str, default=get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DJANGO_DEBUG", cast=bool, default=True)
-
+# DEBUG = config("DJANGO_DEBUG", cast=bool, default=True)
+DEBUG = True
 ALLOWED_HOSTS = [
     "*",
-    ".railway.app"
+    ".railway.app",
+    "localhost",
+    "127.0.0.1",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "*"
@@ -253,9 +255,5 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
-#     "staticfiles": {
-#         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-#     },
-# }
 }
 # De

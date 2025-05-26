@@ -69,47 +69,4 @@ class Lesson(models.Model):
             self.title = f"Dars {self.order}"
         super().save(*args, **kwargs)
 
-class UserProgress(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='progress')
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    is_completed = models.BooleanField(default=False)
-    completion_date = models.DateTimeField(null=True, blank=True)
-    time_spent = models.PositiveIntegerField(default=0, verbose_name="Sarflangan vaqt (soniya)")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        verbose_name = "Foydalanuvchi jarayoni"
-        verbose_name_plural = "Foydalanuvchi jarayonlari"
-        unique_together = ['user', 'lesson']
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.lesson}"
 
-class Bookmark(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookmarks')
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name = "Xatcho'p"
-        verbose_name_plural = "Xatcho'plar"
-        unique_together = ['user', 'lesson']
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.lesson}"
-
-class Note(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notes')
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    content = models.TextField(verbose_name="Eslatma matni")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        verbose_name = "Eslatma"
-        verbose_name_plural = "Eslatmalar"
-        unique_together = ['user', 'lesson']
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.lesson} - Eslatma"

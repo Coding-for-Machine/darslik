@@ -1,257 +1,229 @@
-{% extends 'base.html' %}
-
+<!DOCTYPE html>
 {% load static %}
-{% block content %}
-<article>
-  <!-- Hero qismi -->
-  <section class="hero" id="home" aria-label="hero" style="background-image: url('')">
-    <div class="container">
-      <div class="hero-content">
-        <p class="section-subtitle">Yaxshiroq ta'lim kelajagi biz bilan</p>
-        <h2 class="h1 hero-title">Ta'lim - Bu Akademik Yutuqlardir</h2>
-        <p class="hero-text">
-          Biz bilan birga yangi bilimlar oling va professional mahoratingizni oshiring. 
-          Har qanday darajadagi bilimlar uchun kurslarimiz mavjud.
-        </p>
-        <a href="#" class="btn btn-primary">
-          <span class="span">Hoziroq boshlang</span>
-          <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-        </a>
-      </div>
-
-      <figure class="hero-banner">
-        <img src="{% static 'assets/images/hero-banner.png' %}" width="500" height="500" loading="lazy" alt="hero image" class="w-100">
-        <img src="{% static 'assets/images/hero-abs-1.png' %}" width="318" height="352" loading="lazy" aria-hidden="true" class="abs-img abs-img-1">
-        <img src="{% static 'assets/images/hero-abs-2.png' %}" width="160" height="160" loading="lazy" aria-hidden="true" class="abs-img abs-img-2">
-      </figure>
-    </div>
-  </section>
-
-  <!-- Kurs kategoriyalari -->
-  <section class="section category" aria-label="category">
-    <div class="container">
-      <p class="section-subtitle">Kurs Kategoriyalari</p>
-      <h2 class="h2 section-title">O'rganish uchun mashhur mavzular</h2>
-
-      <ul class="grid-list">
-        <li>
-          <div class="category-card">
-            <div class="card-icon">
-              <ion-icon name="briefcase-outline"></ion-icon>
-            </div>
-            <div>
-              <h3 class="h3 card-title">
-                <a href="#">Shaxsiy rivojlanish</a>
-              </h3>
-              <span class="card-meta">39 ta kurs</span>
-            </div>
-          </div>
-        </li>
-        
-        <!-- Qolgan kategoriyalar shu tarzda qo'shiladi -->
-        <li>
-          <div class="category-card">
-            <div class="card-icon">
-              <ion-icon name="laptop-outline"></ion-icon>
-            </div>
-            <div>
-              <h3 class="h3 card-title">
-                <a href="#">Veb dasturlash</a>
-              </h3>
-              <span class="card-meta">28 ta kurs</span>
-            </div>
-          </div>
-        </li>
-        
-        <li>
-          <div class="category-card">
-            <div class="card-icon">
-              <ion-icon name="server-outline"></ion-icon>
-            </div>
-            <div>
-              <h3 class="h3 card-title">
-                <a href="#">Ma'lumotlar tahlili</a>
-              </h3>
-              <span class="card-meta">15 ta kurs</span>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Biz haqimizda -->
-  <section class="section about" id="about" aria-label="about">
-    <div class="container">
-      <figure class="about-banner">
-        <img src="{% static 'assets/images/about-banner.jpg' %}" width="450" height="590" loading="lazy" alt="about banner" class="w-100 about-img">
-        <img src="{% static 'assets/images/about-abs-1.jpg' %}" width="188" height="242" loading="lazy" aria-hidden="true" class="abs-img abs-img-1">
-        <img src="{% static 'assets/images/about-abs-2.jpg' %}" width="150" height="200" loading="lazy" aria-hidden="true" class="abs-img abs-img-2">
-      </figure>
-
-      <div class="about-content">
-        <p class="section-subtitle">Biz kimiz?</p>
-        <h2 class="h2 section-title">Biz Eng Yaxshi Kasblarni Taklif Etamiz</h2>
-
-        <ul class="about-list">
-          <li class="about-item">
-            <div class="item-icon item-icon-1">
-              <img src="{% static 'assets/images/about-icon-1.png' %}" width="30" height="30" loading="lazy" aria-hidden="true">
-            </div>
-            <div>
-              <h3 class="h3 item-title">Tajribali O'qituvchilar</h3>
-              <p class="item-text">
-                Bizning o'qituvchilarimiz o'z sohalarining yetakchi mutaxassislari bo'lib, sizga eng yaxshi bilimlarni berishga tayyor.
-              </p>
-            </div>
-          </li>
-          
-          <!-- Qolgan afzalliklar shu tarzda qo'shiladi -->
-        </ul>
-
-        <a href="#" class="btn btn-primary">
-          <span class="span">Biz haqimizda batafsil</span>
-          <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Mashhur kurslar -->
-  <section class="section course" id="courses" aria-label="course" >
-    <div class="container">
-      <p class="section-subtitle">Mashhur Kurslar</p>
-      <h2 class="h2 section-title">Bizning Mashhur Kurslarimiz</h2>
-
-      <ul class="grid-list">
-        {% for course in courses %}
-        <li>
-          <div class="course-card">
-            <figure class="card-banner">
-              <img src="{{course.image.url}}" width="370" height="270" loading="lazy" alt="Python dasturlash kursi" class="img-cover">
-            </figure>
-            <div class="card-actions">
-              <span class="badge">Boshlang'ich</span>
-              <button class="whishlist-btn" aria-label="Sevimlilarga qo'shish" data-whish-btn>
-                <ion-icon name="heart"></ion-icon>
-              </button>
-            </div>
-            <div class="card-content">
-              <ul class="card-meta-list">
-                <li class="card-meta-item">
-                  <ion-icon name="reader-outline" aria-hidden="true"></ion-icon>
-                  <span class="card-meta-text">35 ta dars</span>
-                </li>
-                <li class="card-meta-item">
-                  <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
-                  <time datetime="PT18H15M44S" class="card-meta-text">18h 15m</time>
-                </li>
-              </ul>
-              <h3 class="h3">
-                <a href="{{ course.get_absolute_url }}" class="card-title">{{course.title}}</a>
-              </h3>
-              <div class="rating-wrapper">
-                <div class="rating">
-                  <ion-icon name="star"></ion-icon>
-                  <ion-icon name="star"></ion-icon>
-                  <ion-icon name="star"></ion-icon>
-                  <ion-icon name="star"></ion-icon>
-                  <ion-icon name="star-half"></ion-icon>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Ta'lim Platformasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .lesson-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        .lesson-content a {
+            color: #10b981;
+            text-decoration: underline;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center" onclick="showCoursesSection(event)">
+                        <span class="text-xl font-bold text-green-600">O'quvMarkaz</span>
+                    </a>
                 </div>
-                <span class="rating-text">(48 sharh)</span>
-              </div>
-              <div class="card-footer">
-                <div class="card-meta-item">
-                  <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
-                  <span class="card-meta-text">124 o'quvchi</span>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-green-600 transition" onclick="showCoursesSection(event)">Kurslar</a>
+                    <div class="relative w-64">
+                        <input type="text" id="search-input" placeholder="Qidirish..." 
+                            class="w-full py-2 px-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-300">
+                        <button id="search-btn" class="absolute right-3 top-2.5 text-gray-500 hover:text-green-600">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
                 </div>
-              </div>
+                <div class="md:hidden flex items-center">
+                    <button class="mobile-menu-button p-2 focus:outline-none">
+                        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
-          </div>
-        </li>
-        {% endfor%}
-        
-        
-        <!-- Qolgan kurslar shu tarzda qo'shiladi -->
-      </ul>
-
-      <a href="#" class="btn btn-primary">
-        <span class="span">Barcha kurslarni ko'rish</span>
-        <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-      </a>
-    </div>
-  </section>
-
-  <!-- Workshop -->
-  <section class="section cta" aria-label="workshop">
-    <div class="container">
-      <figure class="cta-banner">
-        <img src="{% static 'assets/images/cta-banner.jpg' %}" width="580" height="380" loading="lazy" alt="workshop banner" class="img-cover">
-      </figure>
-      <div class="cta-content">
-        <p class="section-subtitle">Bepul Workshop</p>
-        <h2 class="h2 section-title">Bizning Bepul Workshoplarimizga Qo'shiling</h2>
-        <p class="section-text">
-          Har oy o'tkaziladigan bepul workshoplarimizda qatnashib, yangi bilimlar oling va mutaxassislar bilan suhbatlashish imkoniyatiga ega bo'ling.
-        </p>
-        <a href="#" class="btn btn-secondary">
-          <span class="span">Yaqin workshoplar</span>
-          <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Tadbirlar -->
-  <section class="section event" id="event" aria-label="event">
-    <div class="container">
-      <p class="section-subtitle">Yaqin Tadbirlar</p>
-      <h2 class="h2 section-title">Jamoamizga Qo'shiling</h2>
-
-      <ul class="grid-list">
-        <li>
-          <div class="event-card">
-            <figure class="card-banner">
-              <img src="{% static 'assets/images/event-1.jpg' %}" width="370" height="250" loading="lazy" alt="Dasturlash bo'yicha seminar" class="img-cover">
-            </figure>
-            <time class="badge" datetime="2023-06-15">15 Iyun 2023</time>
-            <div class="card-content">
-              <address class="card-address">
-                <ion-icon name="location-outline" aria-hidden="true"></ion-icon>
-                <span class="span">Toshkent shahri, Yunusobod tumani</span>
-              </address>
-              <h3 class="h3">
-                <a href="#" class="card-title">Dasturlash bo'yicha katta seminar</a>
-              </h3>
-              <a href="#" class="btn-link">
-                <span class="span">Chipta olish</span>
-                <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-              </a>
-            </div>
-          </div>
-        </li>
-        
-        <!-- Qolgan tadbirlar shu tarzda qo'shiladi -->
-      </ul>
-    </div>
-  </section>
-
-  <!-- Yangiliklar obunasi -->
-  <section class="section newsletter" aria-label="newsletter">
-    <div class="container">
-      <p class="section-subtitle">Yangiliklarga Obuna Bo'ling</p>
-      <h2 class="h2 section-title">Eng So'nggi Yangiliklarni Oling</h2>
-      <form action="" class="newsletter-form">
-        <div class="input-wrapper">
-          <input type="email" name="email_address" aria-label="email" placeholder="Elektron pochtangizni kiriting" required class="email-field">
-          <ion-icon name="mail-open-outline" aria-hidden="true"></ion-icon>
         </div>
-        <button type="submit" class="btn btn-primary">
-          <span class="span">Obuna bo'lish</span>
-          <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-        </button>
-      </form>
-    </div>
-  </section>
-</article>
-{% endblock %}
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Loading Spinner -->
+        <div id="loading-spinner" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-8 rounded-lg shadow-xl text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600 mx-auto mb-4"></div>
+                <p class="text-gray-700">Yuklanmoqda...</p>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div id="search-results" class="hidden bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Qidiruv natijalari</h2>
+                <button onclick="showCoursesSection(event)" class="text-gray-500 hover:text-green-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="search-results-content"></div>
+        </div>
+
+        <!-- Courses Section -->
+        <section id="courses-section">
+            <h1 class="text-3xl font-bold text-gray-800 mb-8">Barcha Kurslar</h1>
+            <div id="courses-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- Course Detail Section -->
+        <section id="course-detail-section" class="hidden">
+            <div class="flex items-center mb-8">
+                <button onclick="showCoursesSection(event)" class="flex items-center text-green-600 hover:text-green-800 mr-4">
+                    <i class="fas fa-arrow-left mr-2"></i> Ortga
+                </button>
+                <h1 id="course-title" class="text-3xl font-bold text-gray-800"></h1>
+            </div>
+            
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="lg:w-2/3">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+                        <img id="course-image" src="" alt="Kurs rasmi" class="w-full h-64 object-cover">
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">Kurs haqida</h2>
+                        <div id="course-description" class="prose max-w-none"></div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">Darsliklar</h2>
+                        <div id="course-chapters" class="space-y-4"></div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/3">
+                    <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Kurs ma'lumotlari</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-sm text-gray-500">Yaratilgan sana</p>
+                                <p id="course-created" class="font-medium"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Yangilangan sana</p>
+                                <p id="course-updated" class="font-medium"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chapter Detail Section -->
+        <section id="chapter-detail-section" class="hidden">
+            <div class="flex items-center mb-8">
+                <button onclick="showCourseDetail(currentCourseId)" class="flex items-center text-green-600 hover:text-green-800 mr-4">
+                    <i class="fas fa-arrow-left mr-2"></i> Ortga
+                </button>
+                <h1 id="chapter-title" class="text-3xl font-bold text-gray-800"></h1>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Darslar</h2>
+                    <p class="text-sm text-gray-500"><span id="chapter-lesson-count">0</span> ta dars</p>
+                </div>
+                <div id="chapter-lessons" class="space-y-3"></div>
+            </div>
+        </section>
+
+        <!-- Lesson Detail Section -->
+        <section id="lesson-detail-section" class="hidden">
+            <div class="flex items-center mb-8">
+                <button onclick="showChapterDetail(currentChapterId)" class="flex items-center text-green-600 hover:text-green-800 mr-4">
+                    <i class="fas fa-arrow-left mr-2"></i> Ortga
+                </button>
+                <h1 id="lesson-title" class="text-3xl font-bold text-gray-800"></h1>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <div class="flex items-center">
+                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded mr-2">Dars</span>
+                        <span class="text-sm text-gray-600">
+                            <i class="far fa-clock mr-1"></i>
+                            <span id="lesson-time"></span> daqiqa
+                        </span>
+                    </div>
+                    <span class="text-sm text-gray-600">
+                        <i class="far fa-calendar-alt mr-1"></i>
+                        Yangilangan: <span id="lesson-updated"></span>
+                    </span>
+                </div>
+                
+                <div id="lesson-content" class="lesson-content prose max-w-none"></div>
+                
+                <div class="flex justify-between mt-8 pt-6 border-t border-gray-200">
+                    <button onclick="navigateToPreviousLesson()" class="flex items-center text-green-600 hover:text-green-800">
+                        <i class="fas fa-arrow-left mr-2"></i> Oldingi dars
+                    </button>
+                    <button onclick="navigateToNextLesson()" class="flex items-center text-green-600 hover:text-green-800">
+                        Keyingi dars <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4">O'quvMarkaz</h3>
+                    <p class="text-gray-400">O'zingizni rivojlantiring va yangi bilimlarni o'rganing.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Kurslar</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Dasturlash</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Dizayn</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Marketing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Kompaniya</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Biz haqimizda</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Karyera</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Aloqa</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Ijtimoiy tarmoqlar</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-telegram fa-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-youtube fa-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2023 O'quvMarkaz. Barcha huquqlar himoyalangan.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'assets/js/app.js' %}"></script>
+</body>
+</html>

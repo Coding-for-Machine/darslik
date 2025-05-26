@@ -1,2255 +1,456 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Darslik Dashboard | Edu Platform</title>
+    <title>EduPlatform</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            min-height: 100vh;
         }
-        /* Scrollbar styling */
+        /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
             width: 8px;
         }
         ::-webkit-scrollbar-track {
             background: #f1f1f1;
+            border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb {
             background: #888;
-            border-radius: 4px;
+            border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
-        .sidebar {
-            width: 250px;
-            background-color: #1f2937;
-            color: #e5e7eb;
-            flex-shrink: 0; /* Shrink bo'lmasin */
-            overflow-y: auto; /* Agar kontent ko'p bo'lsa, scroll paydo bo'lsin */
-            padding-bottom: 20px; /* Pastdan biroz bo'sh joy */
+        /* Basic fade-in animation for content */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
         }
-        .sidebar-header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid #374151;
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #f9fafb;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .nav-section-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #9ca3af;
-            padding: 15px 20px 10px;
-            text-transform: uppercase;
+        /* Simple spinner animation */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6; /* Blue-500 */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
         }
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: #e5e7eb;
-            text-decoration: none;
-            transition: background-color 0.2s;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        .nav-link:hover, .nav-link.active {
-            background-color: #374151;
-            color: #fff;
-        }
-        .nav-link.active .icon {
-            color: #34d399; /* Active icon color */
-        }
-        .nav-link .icon {
-            margin-right: 10px;
-            font-size: 1rem;
-            width: 20px; /* Ensure consistent alignment */
-            text-align: center;
-        }
-        .course-item, .bob-item, .lesson-item {
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.95rem;
-        }
-        .course-item:hover, .bob-item:hover, .lesson-item:hover {
-            background-color: #374151;
-        }
-        .course-item.selected, .bob-item.selected, .lesson-item.selected {
-            background-color: #4b5563;
-            color: #fff;
-        }
-        .nested-list {
-            padding-left: 20px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        .nested-list.expanded {
-            max-height: 500px; /* Yetarli balandlikni belgilang */
-            transition: max-height 0.5s ease-in;
-        }
-        .content-area {
-            flex-grow: 1; /* Qolgan bo'sh joyni egallasin */
-            padding: 20px;
-            background-color: #ffffff; /* Asosiy kontent fonini oq rang */
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
-            margin: 20px;
-            border-radius: 8px;
-            overflow-y: auto; /* Agar kontent ko'p bo'lsa, scroll paydo bo'lsin */
-        }
-        .lesson-body img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh; /* Modalni vertikal ravishda cheklash */
-            overflow-y: auto; /* Agar kontent ko'p bo'lsa, scroll paydo bo'lsin */
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            position: relative;
-        }
-        .modal-close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #9ca3af;
-        }
-        .modal-close-btn:hover {
-            color: #374151;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #374151;
-        }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 5px;
-            font-size: 1rem;
-            color: #374151;
-        }
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        .btn-primary {
-            background-color: #34d399;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            border: none;
-            font-size: 1rem;
-        }
-        .btn-primary:hover {
-            background-color: #10b981;
-        }
-        .btn-danger {
-            background-color: #ef4444;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            border: none;
-            font-size: 0.9rem;
-        }
-        .btn-danger:hover {
-            background-color: #dc2626;
-        }
-        .text-green-500 { color: #34d399; }
-        .text-red-500 { color: #ef4444; }
-        .flex-grow { flex-grow: 1; }
-        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .progress-bar-container {
-            width: 100%;
-            background-color: #e5e7eb;
-            border-radius: 9999px;
-            height: 8px;
-            margin-top: 5px;
-        }
-        .progress-bar {
-            height: 100%;
-            background-color: #34d399;
-            border-radius: 9999px;
-            transition: width 0.5s ease-in-out;
-        }
-        /* Hidden utility class */
-        .hidden { display: none !important; }
     </style>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800 antialiased">
+    <div id="app" class="min-h-screen flex flex-col">
+        <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg p-4 md:p-6 sticky top-0 z-50">
+            <div class="container mx-auto flex flex-col md:flex-row items-center justify-between">
+                <h1 class="text-3xl font-extrabold mb-4 md:mb-0 cursor-pointer hover:text-blue-200 transition-colors duration-300" onclick="navigate('/')">
+                    EduPlatform
+                </h1>
 
-    <div id="authModal" class="modal hidden">
-        <div class="modal-content">
-            <button class="modal-close-btn" onclick="document.getElementById('authModal').classList.add('hidden');">&times;</button>
-            <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center">Tizimga kirish / Ro'yxatdan o'tish</h2>
-            <div class="flex justify-center mb-6">
-                <button id="showLoginBtn" class="px-4 py-2 mr-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Login</button>
-                <button id="showRegisterBtn" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">Ro'yxatdan o'tish</button>
-            </div>
-
-            <form id="loginForm" class="login-form">
-                <h3 class="text-xl font-semibold mb-4 text-gray-700">Login</h3>
-                <div class="form-group">
-                    <label for="loginUsername">Foydalanuvchi nomi:</label>
-                    <input type="text" id="loginUsername" name="username" required class="focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Parol:</label>
-                    <input type="password" id="loginPassword" name="password" required class="focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <button type="submit" class="btn-primary w-full">Kirish</button>
-                <p id="loginMessage" class="mt-4 text-center text-red-500"></p>
-            </form>
-
-            <form id="registerForm" class="register-form hidden">
-                <h3 class="text-xl font-semibold mb-4 text-gray-700">Ro'yxatdan o'tish</h3>
-                <div class="form-group">
-                    <label for="registerUsername">Foydalanuvchi nomi:</label>
-                    <input type="text" id="registerUsername" name="username" required class="focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div class="form-group">
-                    <label for="registerEmail">Email:</label>
-                    <input type="email" id="registerEmail" name="email" required class="focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div class="form-group">
-                    <label for="registerPassword">Parol:</label>
-                    <input type="password" id="registerPassword" name="password" required class="focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div class="form-group">
-                    <label for="registerFirstName">Ism (ixtiyoriy):</label>
-                    <input type="text" id="registerFirstName" name="first_name" class="focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div class="form-group">
-                    <label for="registerLastName">Familiya (ixtiyoriy):</label>
-                    <input type="text" id="registerLastName" name="last_name" class="focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <button type="submit" class="btn-primary w-full">Ro'yxatdan o'tish</button>
-                <p id="registerMessage" class="mt-4 text-center text-red-500"></p>
-            </form>
-        </div>
-    </div>
-
-    <div id="adminPanelModal" class="modal hidden">
-        <div class="modal-content max-w-4xl">
-            <button class="modal-close-btn" onclick="document.getElementById('adminPanelModal').classList.add('hidden');">&times;</button>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Admin Boshqaruv Paneli</h2>
-
-            <div class="flex mb-4 border-b pb-4">
-                <button id="showAdminCourses" class="px-4 py-2 mr-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Kurslar</button>
-                <button id="showAdminBobs" class="px-4 py-2 mr-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">Boblar</button>
-                <button id="showAdminLessons" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">Darslar</button>
-            </div>
-
-            <div id="adminCoursesSection" class="admin-section">
-                <h3 class="text-xl font-semibold mb-4 text-gray-700">Kurslarni boshqarish</h3>
-                <button id="addCourseBtn" class="btn-primary mb-4"><i class="fas fa-plus mr-2"></i>Yangi kurs qo'shish</button>
-                <ul id="adminCoursesList" class="space-y-2">
-                    </ul>
-            </div>
-
-            <div id="adminBobsSection" class="admin-section hidden">
-                <h3 class="text-xl font-semibold mb-4 text-gray-700">Boblarni boshqarish</h3>
-                <button id="addBobBtn" class="btn-primary mb-4"><i class="fas fa-plus mr-2"></i>Yangi bob qo'shish</button>
-                <select id="adminBobCourseSelect" class="w-full p-2 border rounded-md mb-4"></select>
-                <ul id="adminBobsList" class="space-y-2">
-                    </ul>
-            </div>
-
-            <div id="adminLessonsSection" class="admin-section hidden">
-                <h3 class="text-xl font-semibold mb-4 text-gray-700">Darslarni boshqarish</h3>
-                <button id="addLessonBtn" class="btn-primary mb-4"><i class="fas fa-plus mr-2"></i>Yangi dars qo'shish</button>
-                <select id="adminLessonCourseSelect" class="w-full p-2 border rounded-md mb-2"></select>
-                <select id="adminLessonBobSelect" class="w-full p-2 border rounded-md mb-4"></select>
-                <ul id="adminLessonsList" class="space-y-2">
-                    </ul>
-            </div>
-        </div>
-    </div>
-
-    <div id="courseEditorModal" class="modal hidden">
-        <div class="modal-content">
-            <button class="modal-close-btn" onclick="document.getElementById('courseEditorModal').classList.add('hidden');">&times;</button>
-            <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center" id="courseEditorTitle">Kursni tahrirlash</h2>
-            <form id="courseEditorForm">
-                <input type="hidden" id="editCourseId">
-                <div class="form-group">
-                    <label for="editCourseTitle">Sarlavha:</label>
-                    <input type="text" id="editCourseTitle" required>
-                </div>
-                <div class="form-group">
-                    <label for="editCourseBody">Matn:</label>
-                    <textarea id="editCourseBody" rows="5"></textarea>
-                </div>
-                <div class="form-group flex items-center">
-                    <input type="checkbox" id="editCourseIsActive" class="mr-2">
-                    <label for="editCourseIsActive">Faol</label>
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="submit" class="btn-primary">Saqlash</button>
-                    <button type="button" class="btn-danger" id="deleteCourseBtn">O'chirish</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="bobEditorModal" class="modal hidden">
-        <div class="modal-content">
-            <button class="modal-close-btn" onclick="document.getElementById('bobEditorModal').classList.add('hidden');">&times;</button>
-            <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center" id="bobEditorTitle">Bobni tahrirlash</h2>
-            <form id="bobEditorForm">
-                <input type="hidden" id="editBobId">
-                <div class="form-group">
-                    <label for="editBobCourse">Kurs:</label>
-                    <select id="editBobCourse" required></select>
-                </div>
-                <div class="form-group">
-                    <label for="editBobTitle">Sarlavha:</label>
-                    <input type="text" id="editBobTitle" required>
-                </div>
-                <div class="form-group">
-                    <label for="editBobOrder">Tartib raqami:</label>
-                    <input type="number" id="editBobOrder" required min="0">
-                </div>
-                <div class="form-group flex items-center">
-                    <input type="checkbox" id="editBobIsActive" class="mr-2">
-                    <label for="editBobIsActive">Faol</label>
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="submit" class="btn-primary">Saqlash</button>
-                    <button type="button" class="btn-danger" id="deleteBobBtn">O'chirish</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="lessonEditorModal" class="modal hidden">
-        <div class="modal-content">
-            <button class="modal-close-btn" onclick="document.getElementById('lessonEditorModal').classList.add('hidden');">&times;</button>
-            <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center" id="lessonEditorTitle">Darsni tahrirlash</h2>
-            <form id="lessonEditorForm">
-                <input type="hidden" id="editLessonId">
-                <div class="form-group">
-                    <label for="editLessonCourse">Kurs:</label>
-                    <select id="editLessonCourse" required></select>
-                </div>
-                <div class="form-group">
-                    <label for="editLessonBob">Bob:</label>
-                    <select id="editLessonBob" required></select>
-                </div>
-                <div class="form-group">
-                    <label for="editLessonTitle">Sarlavha:</label>
-                    <input type="text" id="editLessonTitle" required>
-                </div>
-                <div class="form-group">
-                    <label for="editLessonBody">Matn:</label>
-                    <textarea id="editLessonBody" rows="8"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="editLessonOrder">Tartib raqami:</label>
-                    <input type="number" id="editLessonOrder" required min="0">
-                </div>
-                <div class="form-group">
-                    <label for="editLessonEstimatedReadingTime">O'qish vaqti (minut):</label>
-                    <input type="number" id="editLessonEstimatedReadingTime" min="0">
-                </div>
-                <div class="form-group flex items-center">
-                    <input type="checkbox" id="editLessonIsActive" class="mr-2">
-                    <label for="editLessonIsActive">Faol</label>
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="submit" class="btn-primary">Saqlash</button>
-                    <button type="button" class="btn-danger" id="deleteLessonBtn">O'chirish</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            Edu Platform
-        </div>
-        <nav class="mt-5">
-            <div class="nav-section-title">Asosiy</div>
-            <a href="#" class="nav-link active" id="navCourses">
-                <i class="fas fa-book icon"></i>
-                <span>Kurslar</span>
-            </a>
-            <a href="#" class="nav-link" id="navBookmarks">
-                <i class="fas fa-bookmark icon"></i>
-                <span>Mening xatcho'plarim</span>
-            </a>
-            <a href="#" class="nav-link" id="navNotes">
-                <i class="fas fa-clipboard icon"></i>
-                <span>Mening eslatmalarim</span>
-            </a>
-            <a href="#" class="nav-link" id="navAdminPanel">
-                <i class="fas fa-user-shield icon"></i>
-                <span>Admin Panel</span>
-            </a>
-            <a href="#" class="nav-link" id="navLogin" style="display: none;">
-                <i class="fas fa-sign-in-alt icon"></i>
-                <span>Login</span>
-            </a>
-            <a href="#" class="nav-link" id="navLogout" style="display: none;">
-                <i class="fas fa-sign-out-alt icon"></i>
-                <span>Logout</span>
-            </a>
-        </nav>
-
-        <div class="nav-section-title mt-5">Kurslar Ro'yxati</div>
-        <div id="courseList" class="space-y-1">
-            <div class="p-4 text-gray-400 text-center">Kurslar yuklanmoqda...</div>
-        </div>
-    </aside>
-
-    <main class="content-area">
-        <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-            <h1 class="text-3xl font-bold text-gray-800" id="mainTitle">Kurslar</h1>
-            <div class="flex items-center space-x-4">
-                <div class="relative">
-                    <input type="text" id="searchInput" placeholder="Qidiruv..." class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                </div>
-                <div id="userInfo" class="flex items-center space-x-2">
-                    <i class="fas fa-user-circle text-gray-600 text-2xl"></i>
-                    <span id="usernameDisplay" class="font-medium text-gray-700">Mehmon</span>
+                <div class="relative w-full md:w-1/3">
+                    <input
+                        type="text"
+                        id="search-input"
+                        placeholder="Search courses, bobs, lessons..."
+                        class="w-full p-3 pl-10 rounded-full bg-blue-700 bg-opacity-70 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300"
+                        onkeydown="if(event.key === 'Enter') handleSearch()"
+                    >
+                    <button
+                        onclick="handleSearch()"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-200 hover:text-white transition-colors duration-300"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
                 </div>
             </div>
         </header>
 
-        <div id="contentDisplay" class="min-h-[60vh]">
-            <section id="coursesSection" class="active-section">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Barcha Kurslar</h2>
-                <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <p class="text-gray-600">Kurslar yuklanmoqda...</p>
-                </div>
-            </section>
+        <main id="content" class="flex-grow p-4 md:p-8 container mx-auto flex flex-col items-center justify-center">
+            <div id="loading-spinner" class="spinner hidden"></div>
 
-            <section id="courseDetailSection" class="hidden">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800" id="courseDetailTitle"></h2>
-                <p class="text-gray-600 mb-4" id="courseDetailBody"></p>
-                <div class="progress-bar-container mb-4">
-                    <div id="courseProgressBar" class="progress-bar" style="width: 0%;"></div>
-                    <p class="text-sm text-gray-600 mt-1"><span id="courseProgressText">0%</span> tugallangan (<span id="courseCompletedLessons">0</span>/<span id="courseTotalLessons">0</span> dars)</p>
-                </div>
-
-                <h3 class="text-xl font-semibold mb-3 text-gray-800">Boblar</h3>
-                <div id="courseBobsList" class="space-y-4">
-                    </div>
-            </section>
-
-            <section id="lessonDetailSection" class="hidden">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800" id="lessonTitle"></h2>
-                <div class="flex items-center space-x-4 mb-4">
-                    <button id="markCompletedBtn" class="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600"><i class="fas fa-check-circle mr-2"></i>Tugallangan</button>
-                    <button id="bookmarkBtn" class="px-4 py-2 rounded-md bg-yellow-500 text-white hover:bg-yellow-600"><i class="fas fa-bookmark mr-2"></i>Xatcho'p</button>
-                    <button id="noteBtn" class="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"><i class="fas fa-sticky-note mr-2"></i>Eslatma</button>
-                </div>
-                <div class="lesson-body text-gray-700 leading-relaxed" id="lessonBody">
-                    </div>
-            </section>
-
-            <section id="bookmarksSection" class="hidden">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Mening Xatcho'plarim</h2>
-                <ul id="bookmarksList" class="space-y-2">
-                    </ul>
-            </section>
-
-            <section id="notesSection" class="hidden">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Mening Eslatmalarim</h2>
-                <ul id="notesList" class="space-y-2">
-                    </ul>
-            </section>
-
-            <section id="searchResultsSection" class="hidden">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Qidiruv Natijalari: <span id="searchQueryDisplay"></span></h2>
-                <div id="searchResultsList" class="space-y-4">
-                    <div class="mb-4">
-                        <h3 class="text-xl font-semibold text-gray-700">Kurslar</h3>
-                        <ul id="searchCoursesResults" class="list-disc pl-5"></ul>
-                    </div>
-                    <div class="mb-4">
-                        <h3 class="text-xl font-semibold text-gray-700">Boblar</h3>
-                        <ul id="searchBobsResults" class="list-disc pl-5"></ul>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-700">Darslar</h3>
-                        <ul id="searchLessonsResults" class="list-disc pl-5"></ul>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <div id="noteModal" class="modal hidden">
-            <div class="modal-content">
-                <button class="modal-close-btn" onclick="document.getElementById('noteModal').classList.add('hidden');">&times;</button>
-                <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center">Eslatma</h2>
-                <input type="hidden" id="noteLessonId">
-                <input type="hidden" id="noteId">
-                <div class="form-group">
-                    <label for="noteContent">Eslatma matni:</label>
-                    <textarea id="noteContent" rows="8"></textarea>
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button id="saveNoteBtn" class="btn-primary">Saqlash</button>
-                    <button id="deleteNoteBtn" class="btn-danger hidden">O'chirish</button>
-                </div>
-                <p id="noteMessage" class="mt-4 text-center"></p>
+            <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative w-full max-w-xl text-center shadow-md" role="alert">
+                <strong class="font-bold">Error!</strong>
+                <span id="error-text" class="block sm:inline ml-2">Something went wrong. Please try again.</span>
             </div>
-        </div>
-    </main>
+
+            </main>
+
+        <footer class="bg-gray-800 text-white p-4 md:p-6 text-center text-sm shadow-inner">
+            <div class="container mx-auto">
+                &copy; 2025 EduPlatform. All rights reserved.
+            </div>
+        </footer>
+    </div>
 
     <script>
-        // --- API Configuration ---
-        const API_BASE_URL = 'http://localhost:8000/api'; // O'zingizning API manzilingizni shu yerga kiriting
-        let ACCESS_TOKEN = localStorage.getItem('access_token') || null; // JWT tokenini saqlash
-        let REFRESH_TOKEN = localStorage.getItem('refresh_token') || null; // Refresh tokenini saqlash
+        // Base URL for your API
+        const API_BASE_URL = window.location.origin; // Assumes API is on the same origin. Adjust if different.
 
-        // --- Helper Functions ---
+        // DOM Element references
+        const contentDiv = document.getElementById('content');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const errorMessageDiv = document.getElementById('error-message');
+        const errorTextSpan = document.getElementById('error-text');
+        const searchInput = document.getElementById('search-input');
+
+        // --- Utility Functions ---
 
         /**
-         * Avtorizatsiya headerini qo'shish uchun funksiya.
-         * @returns {HeadersInit} Headers obyektini qaytaradi.
+         * Shows the loading spinner.
          */
-        function getAuthHeaders() {
-            const headers = {
-                'Content-Type': 'application/json',
-            };
-            if (ACCESS_TOKEN) { // ACCESS_TOKEN global o'zgaruvchisi localStorage dan olinadi
-                headers['Authorization'] = `Bearer ${ACCESS_TOKEN}`;
-            }
-            return headers;
+        function showLoading() {
+            contentDiv.innerHTML = ''; // Clear content
+            errorMessageDiv.classList.add('hidden'); // Hide any previous errors
+            loadingSpinner.classList.remove('hidden');
         }
 
         /**
-         * Fetch so'rovini bajarishda umumiy xatoliklarni boshqarish.
-         * @param {Response} response - Fetch API dan qaytgan Response obyekti.
-         * @returns {Promise<any>} JSON javobni yoki xatolikni qaytaradi.
+         * Hides the loading spinner.
          */
-        async function handleResponse(response) {
-            if (!response.ok) {
-                let errorData = {};
-                try {
-                    errorData = await response.json();
-                } catch (e) {
-                    errorData = { message: 'Serverdan xato javob, JSON parse qilinmadi.' };
-                }
-                const errorMessage = errorData.detail || errorData.error || response.statusText || 'Nomaʼlum xato';
-                console.error("API xatosi:", response.status, errorMessage, errorData);
-                throw new Error(errorMessage);
-            }
-            // Ba'zi DELETE so'rovlari 204 No Content qaytarishi mumkin
-            if (response.status === 204) {
-                return {}; // Bo'sh obyekt qaytaramiz
-            }
-            return response.json();
+        function hideLoading() {
+            loadingSpinner.classList.add('hidden');
         }
 
         /**
-         * JWT tokenini yangilash.
+         * Displays an error message.
+         * @param {string} message - The error message to display.
          */
-        async function refreshToken() {
-            if (!REFRESH_TOKEN) {
-                console.warn("Refresh token mavjud emas. Avtorizatsiya talab qilinishi mumkin.");
-                return false;
-            }
+        function showError(message) {
+            hideLoading();
+            errorTextSpan.textContent = message;
+            errorMessageDiv.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the error message.
+         */
+        function hideError() {
+            errorMessageDiv.classList.add('hidden');
+        }
+
+        /**
+         * Fetches data from the API.
+         * @param {string} endpoint - The API endpoint to fetch from.
+         * @returns {Promise<Object|null>} - The JSON response data or null on error.
+         */
+        async function fetchData(endpoint) {
+            showLoading();
+            hideError();
             try {
-                const response = await fetch(`${API_BASE_URL}/token/refresh/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ refresh: REFRESH_TOKEN })
-                });
-                const data = await handleResponse(response);
-                if (data.access) {
-                    ACCESS_TOKEN = data.access;
-                    localStorage.setItem('access_token', ACCESS_TOKEN);
-                    console.log("Token muvaffaqiyatli yangilandi.");
-                    return true;
+                const response = await fetch(`${API_BASE_URL}${endpoint}`);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
                 }
-                return false;
-            } catch (error) {
-                console.error("Token yangilashda xatolik:", error);
-                logoutUser(); // Token yangilashda xato bo'lsa, tizimdan chiqarish
-                return false;
-            }
-        }
-
-        /**
-         * Token bilan himoyalangan so'rovni bajarish.
-         * Agar 401 Unauthorized qaytsa, token yangilashga urinadi va qayta so'rov yuboradi.
-         * @param {string} url - So'rov URL.
-         * @param {object} options - Fetch options.
-         * @returns {Promise<any>} Server javobi.
-         */
-        async function fetchWithAuth(url, options = {}) {
-            options.headers = { ...options.headers, ...getAuthHeaders() };
-            let response = await fetch(url, options);
-
-            if (response.status === 401 && REFRESH_TOKEN) {
-                console.log("401 Unauthorized. Token yangilanmoqda...");
-                const refreshed = await refreshToken();
-                if (refreshed) {
-                    options.headers = { ...options.headers, ...getAuthHeaders() }; // Yangi token bilan headerlarni yangilash
-                    response = await fetch(url, options); // So'rovni qayta yuborish
-                } else {
-                    console.error("Token yangilash muvaffaqiyatsiz tugadi. Login sahifasiga yo'naltirilmoqda.");
-                    showAuthModal();
-                    throw new Error("Token yangilash muvaffaqiyatsiz. Iltimos, qayta login qiling.");
-                }
-            }
-            return handleResponse(response);
-        }
-
-        // --- Authentication Endpoints ---
-        async function registerUser(userData) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/register/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(userData),
-                });
-                return await handleResponse(response);
-            } catch (error) {
-                console.error("Ro'yxatdan o'tishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function loginUser(username, password) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/token/pair`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                });
-                const data = await handleResponse(response);
-                if (data.access && data.refresh) {
-                    ACCESS_TOKEN = data.access;
-                    REFRESH_TOKEN = data.refresh;
-                    localStorage.setItem('access_token', ACCESS_TOKEN);
-                    localStorage.setItem('refresh_token', REFRESH_TOKEN);
-                    console.log("Login muvaffaqiyatli, tokenlar saqlandi.");
-                }
+                const data = await response.json();
+                hideLoading();
                 return data;
             } catch (error) {
-                console.error("Login qilishda xatolik:", error);
-                throw error;
+                console.error('Fetch error:', error);
+                showError(`Failed to load data: ${error.message}`);
+                hideLoading();
+                return null;
             }
         }
 
-        function logoutUser() {
-            ACCESS_TOKEN = null;
-            REFRESH_TOKEN = null;
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            updateUserUI(); // UI ni yangilash
-            showAuthModal(); // Login modalini ko'rsatish
-            console.log("Tizimdan chiqildi, tokenlar o'chirildi.");
-        }
+        // --- Rendering Functions ---
 
-        // --- Course Endpoints (Admin qo'llab-quvvatlashi bilan) ---
-        async function listCourses() {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/courses/`, { method: 'GET' });
-            } catch (error) {
-                console.error("Kurslar ro'yxatini olishda xatolik:", error);
-                throw error;
+        /**
+         * Renders the list of courses.
+         * @param {Array<Object>} courses - An array of course objects.
+         */
+        function renderCourses(courses) {
+            hideLoading();
+            hideError();
+            if (!courses || courses.length === 0) {
+                contentDiv.innerHTML = `
+                    <div class="text-center py-10">
+                        <p class="text-xl text-gray-600">No courses found.</p>
+                        <p class="text-md text-gray-500 mt-2">Check back later for new content!</p>
+                    </div>
+                `;
+                return;
             }
-        }
 
-        async function getCourse(courseId) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/courses/${courseId}/`, { method: 'GET' });
-            } catch (error) {
-                console.error("Kursni olishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function getCourseBobs(courseId) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/courses/${courseId}/bobs/`, { method: 'GET' });
-            } catch (error) {
-                console.error("Kurs boblarini olishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function getCourseDetail(courseId) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/courses/${courseId}/`, { method: 'GET' });
-            } catch (error) {
-                console.error("Kursning to'liq ma'lumotini olishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        // Admin: Create/Update/Delete Course
-        // Eslatma: Bu endpointlar sizning Django backend API-ingizda mavjud bo'lishi kerak.
-        // Agar ular mavjud bo'lmasa, bu funksiyalar ishlamaydi.
-        async function createCourse(courseData) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/courses/`, {
-                    method: 'POST',
-                    body: JSON.stringify(courseData)
-                });
-            } catch (error) {
-                console.error("Kurs yaratishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function updateCourse(courseId, courseData) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/courses/${courseId}/`, {
-                    method: 'PUT',
-                    body: JSON.stringify(courseData)
-                });
-            } catch (error) {
-                console.error("Kursni yangilashda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function deleteCourse(courseId) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/courses/${courseId}/`, { method: 'DELETE' });
-            } catch (error) {
-                console.error("Kursni o'chirishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        // --- Bob Endpoints (Admin qo'llab-quvvatlashi bilan) ---
-        async function getBobDetail(bobId) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/bobs/${bobId}/`, { method: 'GET' });
-            } catch (error) {
-                console.error("Bob ma'lumotlarini olishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        // Admin: Create/Update/Delete Bob
-        async function createBob(bobData) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/bobs/`, {
-                    method: 'POST',
-                    body: JSON.stringify(bobData)
-                });
-            } catch (error) {
-                console.error("Bob yaratishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function updateBob(bobId, bobData) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/bobs/${bobId}/`, {
-                    method: 'PUT',
-                    body: JSON.stringify(bobData)
-                });
-            } catch (error) {
-                console.error("Bobni yangilashda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function deleteBob(bobId) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/bobs/${bobId}/`, { method: 'DELETE' });
-            } catch (error) {
-                console.error("Bobni o'chirishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        // --- Lesson Endpoints (Admin qo'llab-quvvatlashi bilan) ---
-        async function getLesson(lessonId) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/lessons/${lessonId}/`, { method: 'GET' });
-            } catch (error) {
-                console.error("Darsni olishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        // Admin: Create/Update/Delete Lesson
-        async function createLesson(lessonData) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/lessons/`, {
-                    method: 'POST',
-                    body: JSON.stringify(lessonData)
-                });
-            } catch (error) {
-                console.error("Dars yaratishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function updateLesson(lessonId, lessonData) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/lessons/${lessonId}/`, {
-                    method: 'PUT',
-                    body: JSON.stringify(lessonData)
-                });
-            } catch (error) {
-                console.error("Darsni yangilashda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function deleteLesson(lessonId) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/lessons/${lessonId}/`, { method: 'DELETE' });
-            } catch (error) {
-                console.error("Darsni o'chirishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        // --- Progress Endpoints ---
-        async function updateProgress(progressData) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/progress/update/`, {
-                    method: 'POST',
-                    body: JSON.stringify(progressData),
-                });
-            } catch (error) {
-                console.error("Progressni yangilashda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function getProgressStats(courseId = null) {
-            try {
-                let url = `${API_BASE_URL}/progress/stats/`;
-                if (courseId !== null) {
-                    url += `?course_id=${courseId}`;
-                }
-                return await fetchWithAuth(url, { method: 'GET' });
-            } catch (error) {
-                console.error("Progress statistikasini olishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        // --- Bookmark Endpoints ---
-        async function toggleBookmark(lessonId) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/bookmarks/toggle/`, {
-                    method: 'POST',
-                    body: JSON.stringify({ lesson_id: lessonId }),
-                });
-            } catch (error) {
-                console.error("Xatcho'pni o'zgartirishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function getBookmarks() {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/bookmarks/`, { method: 'GET' });
-            } catch (error) {
-                console.error("Xatcho'plarni olishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        // --- Note Endpoints ---
-        async function createNote(noteData) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/notes/`, {
-                    method: 'POST',
-                    body: JSON.stringify(noteData),
-                });
-            } catch (error) {
-                console.error("Eslatma yaratish/yangilashda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function getNote(lessonId) {
-            try {
-                // getNote API endpointi 204 No Content qaytarishi mumkin, shuning uchun fetchWithAuth ishlatishda ehtiyot bo'lish kerak.
-                // handleResponse funksiyasi 204 ni to'g'ri boshqaradi.
-                const response = await fetchWithAuth(`${API_BASE_URL}/notes/${lessonId}/`, {
-                    method: 'GET',
-                });
-                // Agar 204 qaytsa, handleResponse bo'sh obyekt qaytaradi.
-                // Lekin bizning API da None qaytsa, 204 status bilan keladi.
-                // Shuning uchun, agar bo'sh obyekt qaytsa, null deb hisoblaymiz.
-                if (Object.keys(response).length === 0) { // Check if the response is an empty object
-                    return null;
-                }
-                return response;
-            } catch (error) {
-                // Agar eslatma topilmasa va API 404 qaytarsa, bu yerda ushlanadi.
-                if (error.message.includes("Not Found")) {
-                    return null;
-                }
-                console.error("Eslatmani olishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function updateNote(noteId, updateData) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/notes/${noteId}/`, {
-                    method: 'PUT',
-                    body: JSON.stringify(updateData),
-                });
-            } catch (error) {
-                console.error("Eslatmani yangilashda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function deleteNote(noteId) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/notes/${noteId}/`, { method: 'DELETE' });
-            } catch (error) {
-                console.error("Eslatmani o'chirishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        async function getUserNotes() {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/notes/`, { method: 'GET' });
-            } catch (error) {
-                console.error("Foydalanuvchi eslatmalarini olishda xatolik:", error);
-                throw error;
-            }
-        }
-
-        // --- Search Endpoint ---
-        async function search(query) {
-            try {
-                return await fetchWithAuth(`${API_BASE_URL}/search/?q=${encodeURIComponent(query)}`, { method: 'GET' });
-            } catch (error) {
-                console.error("Qidiruvda xatolik:", error);
-                throw error;
-            }
-        }
-
-        // --- UI State Management and Rendering Functions ---
-        let currentCourseId = null;
-        let currentBobId = null;
-        let currentLessonId = null;
-        let allCourses = []; // Cache for courses
-        let allBobs = [];    // Cache for bobs (for admin panel)
-        let allLessons = []; // Cache for lessons (for admin panel)
-
-        const elements = {
-            authModal: document.getElementById('authModal'),
-            loginForm: document.getElementById('loginForm'),
-            registerForm: document.getElementById('registerForm'),
-            showLoginBtn: document.getElementById('showLoginBtn'),
-            showRegisterBtn: document.getElementById('showRegisterBtn'),
-            loginMessage: document.getElementById('loginMessage'),
-            registerMessage: document.getElementById('registerMessage'),
-            usernameDisplay: document.getElementById('usernameDisplay'),
-            navLogin: document.getElementById('navLogin'),
-            navLogout: document.getElementById('navLogout'),
-            navAdminPanel: document.getElementById('navAdminPanel'),
-
-            mainTitle: document.getElementById('mainTitle'),
-            contentDisplay: document.getElementById('contentDisplay'),
-            coursesSection: document.getElementById('coursesSection'),
-            courseDetailSection: document.getElementById('courseDetailSection'),
-            lessonDetailSection: document.getElementById('lessonDetailSection'),
-            bookmarksSection: document.getElementById('bookmarksSection'),
-            notesSection: document.getElementById('notesSection'),
-            searchResultsSection: document.getElementById('searchResultsSection'),
-
-            courseList: document.getElementById('courseList'),
-            coursesGrid: document.getElementById('coursesGrid'),
-            courseDetailTitle: document.getElementById('courseDetailTitle'),
-            courseDetailBody: document.getElementById('courseDetailBody'),
-            courseProgressBar: document.getElementById('courseProgressBar'),
-            courseProgressText: document.getElementById('courseProgressText'),
-            courseCompletedLessons: document.getElementById('courseCompletedLessons'),
-            courseTotalLessons: document.getElementById('courseTotalLessons'),
-            courseBobsList: document.getElementById('courseBobsList'),
-
-            lessonTitle: document.getElementById('lessonTitle'),
-            lessonBody: document.getElementById('lessonBody'),
-            markCompletedBtn: document.getElementById('markCompletedBtn'),
-            bookmarkBtn: document.getElementById('bookmarkBtn'),
-            noteBtn: document.getElementById('noteBtn'),
-
-            bookmarksList: document.getElementById('bookmarksList'),
-            notesList: document.getElementById('notesList'),
-            noteModal: document.getElementById('noteModal'),
-            noteLessonId: document.getElementById('noteLessonId'),
-            noteId: document.getElementById('noteId'),
-            noteContent: document.getElementById('noteContent'),
-            saveNoteBtn: document.getElementById('saveNoteBtn'),
-            deleteNoteBtn: document.getElementById('deleteNoteBtn'),
-            noteMessage: document.getElementById('noteMessage'),
-
-            searchInput: document.getElementById('searchInput'),
-            searchQueryDisplay: document.getElementById('searchQueryDisplay'),
-            searchCoursesResults: document.getElementById('searchCoursesResults'),
-            searchBobsResults: document.getElementById('searchBobsResults'),
-            searchLessonsResults: document.getElementById('searchLessonsResults'),
-
-            // Admin Panel Elements
-            adminPanelModal: document.getElementById('adminPanelModal'),
-            showAdminCourses: document.getElementById('showAdminCourses'),
-            showAdminBobs: document.getElementById('showAdminBobs'),
-            showAdminLessons: document.getElementById('showAdminLessons'),
-            adminCoursesSection: document.getElementById('adminCoursesSection'),
-            adminBobsSection: document.getElementById('adminBobsSection'),
-            adminLessonsSection: document.getElementById('adminLessonsSection'),
-            addCourseBtn: document.getElementById('addCourseBtn'),
-            adminCoursesList: document.getElementById('adminCoursesList'),
-            addBobBtn: document.getElementById('addBobBtn'),
-            adminBobCourseSelect: document.getElementById('adminBobCourseSelect'),
-            adminBobsList: document.getElementById('adminBobsList'),
-            addLessonBtn: document.getElementById('addLessonBtn'),
-            adminLessonCourseSelect: document.getElementById('adminLessonCourseSelect'),
-            adminLessonBobSelect: document.getElementById('adminLessonBobSelect'),
-            adminLessonsList: document.getElementById('adminLessonsList'),
-
-            // Editor Modals
-            courseEditorModal: document.getElementById('courseEditorModal'),
-            courseEditorTitle: document.getElementById('courseEditorTitle'),
-            courseEditorForm: document.getElementById('courseEditorForm'),
-            editCourseId: document.getElementById('editCourseId'),
-            editCourseTitle: document.getElementById('editCourseTitle'),
-            editCourseBody: document.getElementById('editCourseBody'),
-            editCourseIsActive: document.getElementById('editCourseIsActive'),
-            deleteCourseBtn: document.getElementById('deleteCourseBtn'),
-
-            bobEditorModal: document.getElementById('bobEditorModal'),
-            bobEditorTitle: document.getElementById('bobEditorTitle'),
-            bobEditorForm: document.getElementById('bobEditorForm'),
-            editBobId: document.getElementById('editBobId'),
-            editBobCourse: document.getElementById('editBobCourse'),
-            editBobTitle: document.getElementById('editBobTitle'),
-            editBobOrder: document.getElementById('editBobOrder'),
-            editBobIsActive: document.getElementById('editBobIsActive'),
-            deleteBobBtn: document.getElementById('deleteBobBtn'),
-
-            lessonEditorModal: document.getElementById('lessonEditorModal'),
-            lessonEditorTitle: document.getElementById('lessonEditorTitle'),
-            lessonEditorForm: document.getElementById('lessonEditorForm'),
-            editLessonId: document.getElementById('editLessonId'),
-            editLessonCourse: document.getElementById('editLessonCourse'),
-            editLessonBob: document.getElementById('editLessonBob'),
-            editLessonTitle: document.getElementById('editLessonTitle'),
-            editLessonBody: document.getElementById('editLessonBody'),
-            editLessonOrder: document.getElementById('editLessonOrder'),
-            editLessonEstimatedReadingTime: document.getElementById('editLessonEstimatedReadingTime'),
-            editLessonIsActive: document.getElementById('editLessonIsActive'),
-            deleteLessonBtn: document.getElementById('deleteLessonBtn'),
-        };
-
-        // Utility to switch active sections
-        function showSection(sectionId) {
-            const sections = [
-                elements.coursesSection,
-                elements.courseDetailSection,
-                elements.lessonDetailSection,
-                elements.bookmarksSection,
-                elements.notesSection,
-                elements.searchResultsSection
-            ];
-            sections.forEach(section => {
-                section.classList.add('hidden');
-            });
-            document.getElementById(sectionId).classList.remove('hidden');
-        }
-
-        // Update UI based on authentication status
-        function updateUserUI() {
-            if (ACCESS_TOKEN) {
-                elements.navLogin.style.display = 'none';
-                elements.navLogout.style.display = 'flex';
-                // Foydalanuvchi nomini JWT tokenidan olish (yoki login so'rovidan qaytgan user ma'lumotlaridan)
-                try {
-                    const tokenPayload = JSON.parse(atob(ACCESS_TOKEN.split('.')[1]));
-                    elements.usernameDisplay.textContent = tokenPayload.username || "Foydalanuvchi";
-                } catch (e) {
-                    elements.usernameDisplay.textContent = "Foydalanuvchi";
-                }
-            } else {
-                elements.navLogin.style.display = 'flex';
-                elements.navLogout.style.display = 'none';
-                elements.usernameDisplay.textContent = "Mehmon";
-            }
-        }
-
-        function showAuthModal() {
-            elements.authModal.classList.remove('hidden');
-            elements.loginForm.classList.remove('hidden');
-            elements.registerForm.classList.add('hidden');
-            elements.showLoginBtn.classList.add('bg-indigo-600', 'text-white');
-            elements.showLoginBtn.classList.remove('bg-gray-200', 'text-gray-700');
-            elements.showRegisterBtn.classList.add('bg-gray-200', 'text-gray-700');
-            elements.showRegisterBtn.classList.remove('bg-indigo-600', 'text-white');
-            elements.loginMessage.textContent = '';
-            elements.registerMessage.textContent = '';
-        }
-
-        // --- Render Functions ---
-        async function renderCoursesSidebar() {
-            elements.courseList.innerHTML = '<div class="p-4 text-gray-400 text-center">Yuklanmoqda...</div>';
-            try {
-                allCourses = await listCourses(); // API dan barcha kurslarni olish
-                elements.courseList.innerHTML = ''; // Oldingi kontentni tozalash
-                if (allCourses.length === 0) {
-                    elements.courseList.innerHTML = '<p class="p-4 text-gray-400 text-center">Hali kurslar mavjud emas.</p>';
-                    return;
-                }
-                allCourses.forEach(course => {
-                    const courseDiv = document.createElement('div');
-                    courseDiv.classList.add('course-item', 'relative', 'group');
-                    courseDiv.dataset.courseId = course.id;
-                    courseDiv.innerHTML = `
-                        <div class="flex-grow">
-                            <h4 class="font-medium truncate">${course.title}</h4>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: ${course.progress_percentage || 0}%;"></div>
+            contentDiv.innerHTML = `
+                <h2 class="text-4xl font-bold text-gray-900 mb-8 text-center fade-in">Our Courses</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl mx-auto">
+                    ${courses.map(course => `
+                        <div
+                            class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer overflow-hidden fade-in"
+                            onclick="navigate('/courses/${course.id}/detail')"
+                        >
+                            <img
+                                src="${course.image || 'https://placehold.co/600x400/E0E7FF/4F46E5?text=Course+Image'}"
+                                onerror="this.onerror=null;this.src='https://placehold.co/600x400/E0E7FF/4F46E5?text=Course+Image';"
+                                alt="${course.title}"
+                                class="w-full h-48 object-cover rounded-t-xl"
+                            >
+                            <div class="p-6">
+                                <h3 class="text-2xl font-semibold text-gray-900 mb-2">${course.title}</h3>
+                                <p class="text-gray-600 text-sm line-clamp-3">${course.body}</p>
+                                <div class="mt-4 text-sm text-gray-500">
+                                    Created: ${new Date(course.created_at).toLocaleDateString()}
+                                </div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-1">${Math.round(course.progress_percentage || 0)}% tugallangan</p>
                         </div>
-                        <i class="fas fa-chevron-right text-gray-400 transition-transform duration-200 group-[.expanded]:rotate-90"></i>
-                    `;
-                    courseDiv.addEventListener('click', async () => {
-                        // Toggle active class
-                        document.querySelectorAll('.course-item').forEach(item => item.classList.remove('selected'));
-                        courseDiv.classList.add('selected');
-
-                        currentCourseId = course.id;
-                        currentBobId = null; // Reset bob when course changes
-                        currentLessonId = null; // Reset lesson when course changes
-                        await renderCourseDetail(course.id);
-                        showSection('courseDetailSection');
-                        elements.mainTitle.textContent = course.title;
-
-                        // Toggle expanded class
-                        courseDiv.classList.toggle('expanded');
-                        const nestedList = courseDiv.nextElementSibling;
-                        if (nestedList && nestedList.classList.contains('nested-list')) {
-                            nestedList.classList.toggle('expanded');
-                        }
-                    });
-
-                    elements.courseList.appendChild(courseDiv);
-
-                    // Add nested list for bobs initially hidden
-                    const bobsListDiv = document.createElement('div');
-                    bobsListDiv.classList.add('nested-list');
-                    bobsListDiv.id = `bobs-for-course-${course.id}`;
-                    elements.courseList.appendChild(bobsListDiv);
-                });
-            } catch (error) {
-                elements.courseList.innerHTML = `<p class="p-4 text-red-400 text-center">Kurslarni yuklashda xato: ${error.message}</p>`;
-                if (error.message.includes("Login qiling") || error.message.includes("Token yangilash muvaffaqiyatsiz")) {
-                    showAuthModal();
-                }
-            }
+                    `).join('')}
+                </div>
+            `;
         }
 
-        async function renderCourseCards() {
-            elements.coursesGrid.innerHTML = '<p class="text-gray-600">Yuklanmoqda...</p>';
-            try {
-                const courses = await listCourses();
-                elements.coursesGrid.innerHTML = '';
-                if (courses.length === 0) {
-                    elements.coursesGrid.innerHTML = '<p class="text-gray-600">Hozircha kurslar mavjud emas.</p>';
-                    return;
-                }
-                courses.forEach(course => {
-                    const card = document.createElement('div');
-                    card.classList.add('bg-white', 'p-6', 'rounded-lg', 'shadow-md', 'hover:shadow-lg', 'transition-shadow', 'cursor-pointer');
-                    card.innerHTML = `
-                        <h3 class="text-xl font-semibold mb-2 text-gray-800">${course.title}</h3>
-                        <p class="text-gray-600 text-sm mb-3 line-clamp-3">${course.body || 'Kurs tavsifi mavjud emas.'}</p>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" style="width: ${course.progress_percentage || 0}%;"></div>
-                        </div>
-                        <p class="text-xs text-gray-600 mt-1">${Math.round(course.progress_percentage || 0)}% tugallangan</p>
-                    `;
-                    card.addEventListener('click', async () => {
-                        currentCourseId = course.id;
-                        currentBobId = null;
-                        currentLessonId = null;
-                        await renderCourseDetail(course.id);
-                        showSection('courseDetailSection');
-                        elements.mainTitle.textContent = course.title;
-                    });
-                    elements.coursesGrid.appendChild(card);
-                });
-            } catch (error) {
-                elements.coursesGrid.innerHTML = `<p class="text-red-500">Kurslarni yuklashda xato: ${error.message}</p>`;
+        /**
+         * Renders the detailed view of a course, including its bobs and lessons.
+         * @param {Object} course - The course detail object.
+         */
+        function renderCourseDetail(course) {
+            hideLoading();
+            hideError();
+            if (!course) {
+                showError('Course not found.');
+                return;
             }
-        }
 
-        async function renderCourseDetail(courseId) {
-            elements.courseDetailTitle.textContent = 'Yuklanmoqda...';
-            elements.courseDetailBody.textContent = '';
-            elements.courseProgressBar.style.width = '0%';
-            elements.courseProgressText.textContent = '0%';
-            elements.courseCompletedLessons.textContent = '0';
-            elements.courseTotalLessons.textContent = '0';
-            elements.courseBobsList.innerHTML = '<p class="text-gray-600">Yuklanmoqda...</p>';
+            contentDiv.innerHTML = `
+                <div class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8 fade-in">
+                    <button onclick="navigate('/')" class="mb-6 text-blue-600 hover:text-blue-800 flex items-center transition-colors duration-300">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Back to Courses
+                    </button>
 
-            try {
-                const course = await getCourseDetail(courseId);
-                elements.courseDetailTitle.textContent = course.title;
-                elements.courseDetailBody.textContent = course.body;
-                elements.courseProgressBar.style.width = `${course.progress_percentage || 0}%`;
-                elements.courseProgressText.textContent = `${Math.round(course.progress_percentage || 0)}%`;
-                elements.courseCompletedLessons.textContent = course.completed_lessons;
-                elements.courseTotalLessons.textContent = course.total_lessons;
+                    <img
+                        src="${course.image || 'https://placehold.co/800x400/E0E7FF/4F46E5?text=Course+Image'}"
+                        onerror="this.onerror=null;this.src='https://placehold.co/800x400/E0E7FF/4F46E5?text=Course+Image';"
+                        alt="${course.title}"
+                        class="w-full h-64 object-cover rounded-lg mb-6 shadow-md"
+                    >
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4">${course.title}</h2>
+                    <p class="text-gray-700 leading-relaxed mb-8 text-lg">${course.body}</p>
 
-                elements.courseBobsList.innerHTML = '';
-                if (course.bobs && course.bobs.length > 0) {
-                    course.bobs.forEach(bob => {
-                        const bobDiv = document.createElement('div');
-                        bobDiv.classList.add('bg-gray-50', 'p-4', 'rounded-md', 'shadow-sm', 'mb-2', 'cursor-pointer', 'bob-item', 'group');
-                        bobDiv.dataset.bobId = bob.id;
-                        bobDiv.innerHTML = `
-                            <h4 class="font-semibold text-gray-800">${bob.title} <span class="text-gray-500 text-sm">(${bob.lesson_count} dars)</span></h4>
-                            <i class="fas fa-chevron-right absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 transition-transform duration-200 group-[.expanded]:rotate-90"></i>
-                            <div class="nested-list" id="lessons-for-bob-${bob.id}"></div>
-                        `;
-                        bobDiv.style.position = 'relative'; // For absolute positioning of chevron
+                    <h3 class="text-3xl font-semibold text-gray-900 mb-6 border-b pb-3">Chapters & Lessons</h3>
 
-                        bobDiv.addEventListener('click', async () => {
-                            // Toggle active class for bobs
-                            document.querySelectorAll('.bob-item').forEach(item => item.classList.remove('selected'));
-                            bobDiv.classList.add('selected');
-
-                            currentBobId = bob.id;
-                            currentLessonId = null; // Reset lesson when bob changes
-                            await renderBobDetail(bob.id);
-
-                            // Toggle expanded class
-                            bobDiv.classList.toggle('expanded');
-                            const nestedList = document.getElementById(`lessons-for-bob-${bob.id}`);
-                            if (nestedList) {
-                                nestedList.classList.toggle('expanded');
-                            }
-                        });
-                        elements.courseBobsList.appendChild(bobDiv);
-                    });
-                } else {
-                    elements.courseBobsList.innerHTML = '<p class="text-gray-600">Bu kursda hali boblar mavjud emas.</p>';
-                }
-            } catch (error) {
-                elements.courseDetailSection.innerHTML = `<p class="text-red-500">Kurs ma'lumotlarini yuklashda xato: ${error.message}</p>`;
-            }
-        }
-
-        async function renderBobDetail(bobId) {
-            const lessonsListDiv = document.getElementById(`lessons-for-bob-${bobId}`);
-            if (lessonsListDiv) {
-                lessonsListDiv.innerHTML = '<p class="text-gray-600 p-2">Yuklanmoqda...</p>';
-            }
-            try {
-                const bob = await getBobDetail(bobId);
-                if (lessonsListDiv) {
-                    lessonsListDiv.innerHTML = ''; // Oldingi kontentni tozalash
-                    if (bob.lessons && bob.lessons.length > 0) {
-                        bob.lessons.forEach(lesson => {
-                            const lessonDiv = document.createElement('div');
-                            lessonDiv.classList.add('lesson-item', 'px-4', 'py-2', 'border-t', 'border-gray-200', 'flex', 'items-center', 'justify-between');
-                            lessonDiv.dataset.lessonId = lesson.id;
-                            lessonDiv.innerHTML = `
-                                <div class="flex items-center">
-                                    <i class="fas fa-circle-dot mr-2 ${lesson.is_completed ? 'text-green-500' : 'text-gray-400'}"></i>
-                                    <span class="truncate">${lesson.title}</span>
+                    ${course.bobs && course.bobs.length > 0 ? `
+                        <div class="space-y-6">
+                            ${course.bobs.map(bob => `
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 shadow-sm fade-in">
+                                    <h4 class="text-2xl font-semibold text-blue-800 mb-4">${bob.title}</h4>
+                                    ${bob.lessons && bob.lessons.length > 0 ? `
+                                        <ul class="list-none space-y-3 pl-0">
+                                            ${bob.lessons.map(lesson => `
+                                                <li
+                                                    class="flex items-center bg-white p-4 rounded-md shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-200"
+                                                    onclick="navigate('/lessons/${lesson.id}')"
+                                                >
+                                                    <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    <span class="text-lg text-gray-800 font-medium">${lesson.title}</span>
+                                                    <span class="ml-auto text-sm text-gray-500">${lesson.estimated_reading_time} min read</span>
+                                                </li>
+                                            `).join('')}
+                                        </ul>
+                                    ` : `
+                                        <p class="text-gray-500 italic">No lessons available in this chapter yet.</p>
+                                    `}
                                 </div>
-                                <div class="flex items-center space-x-2">
-                                    ${lesson.has_bookmark ? '<i class="fas fa-bookmark text-yellow-500" title="Xatcho\'p qo\'yilgan"></i>' : ''}
-                                    ${lesson.has_note ? '<i class="fas fa-sticky-note text-blue-500" title="Eslatma mavjud"></i>' : ''}
-                                </div>
-                            `;
-                            lessonDiv.addEventListener('click', async (event) => {
-                                // Toggle active class for lessons
-                                document.querySelectorAll('.lesson-item').forEach(item => item.classList.remove('selected'));
-                                lessonDiv.classList.add('selected');
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <p class="text-gray-600 italic text-center py-8">No chapters found for this course.</p>
+                    `}
+                </div>
+            `;
+        }
 
-                                currentLessonId = lesson.id;
-                                await renderLessonDetail(lesson.id);
-                                showSection('lessonDetailSection');
-                                elements.mainTitle.textContent = lesson.title;
-                                event.stopPropagation(); // Bobning click eventini to'xtatish
-                            });
-                            lessonsListDiv.appendChild(lessonDiv);
-                        });
-                    } else {
-                        lessonsListDiv.innerHTML = '<p class="p-2 text-gray-600">Bu bobda hali darslar mavjud emas.</p>';
+        /**
+         * Renders the detailed view of a lesson.
+         * @param {Object} lesson - The lesson object.
+         */
+        function renderLessonDetail(lesson) {
+            hideLoading();
+            hideError();
+            if (!lesson) {
+                showError('Lesson not found.');
+                return;
+            }
+
+            // Assuming we can get back to the course or bob. For simplicity, we'll go back to courses list.
+            // In a real app, you might pass parent IDs for better navigation.
+            contentDiv.innerHTML = `
+                <div class="w-full max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8 fade-in">
+                    <button onclick="window.history.back()" class="mb-6 text-blue-600 hover:text-blue-800 flex items-center transition-colors duration-300">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Back
+                    </button>
+
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4">${lesson.title}</h2>
+                    <div class="flex items-center text-gray-600 mb-6">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="text-lg">${lesson.estimated_reading_time} min read</span>
+                    </div>
+
+                    <div class="prose prose-lg max-w-none text-gray-800 leading-relaxed mb-8">
+                        ${lesson.body}
+                    </div>
+
+                    <div class="text-sm text-gray-500 border-t pt-4">
+                        Last updated: ${new Date(lesson.updated_at).toLocaleDateString()}
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Renders search results.
+         * @param {Object} results - The search results object with courses, bobs, and lessons arrays.
+         */
+        function renderSearchResults(results) {
+            hideLoading();
+            hideError();
+            const { courses, bobs, lessons } = results;
+
+            const hasResults = courses.length > 0 || bobs.length > 0 || lessons.length > 0;
+
+            contentDiv.innerHTML = `
+                <div class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8 fade-in">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Search Results</h2>
+
+                    ${!hasResults ? `
+                        <div class="text-center py-10">
+                            <p class="text-xl text-gray-600">No results found for your query.</p>
+                            <p class="text-md text-gray-500 mt-2">Try a different search term.</p>
+                        </div>
+                    ` : ''}
+
+                    ${courses.length > 0 ? `
+                        <h3 class="text-2xl font-semibold text-blue-700 mb-4 border-b pb-2">Courses (${courses.length})</h3>
+                        <ul class="list-none space-y-3 mb-8">
+                            ${courses.map(item => `
+                                <li class="bg-blue-50 p-4 rounded-md shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-blue-200" onclick="navigate('/courses/${item.id}/detail')">
+                                    <span class="text-lg font-medium text-gray-800">${item.title}</span>
+                                    <span class="text-sm text-gray-500 ml-2">(Course)</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : ''}
+
+                    ${bobs.length > 0 ? `
+                        <h3 class="text-2xl font-semibold text-green-700 mb-4 border-b pb-2">Chapters (${bobs.length})</h3>
+                        <ul class="list-none space-y-3 mb-8">
+                            ${bobs.map(item => `
+                                <li class="bg-green-50 p-4 rounded-md shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-green-200" onclick="navigate('/courses/${item.course_id}/detail')">
+                                    <span class="text-lg font-medium text-gray-800">${item.title}</span>
+                                    <span class="text-sm text-gray-500 ml-2">(Chapter in Course ID: ${item.course_id})</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : ''}
+
+                    ${lessons.length > 0 ? `
+                        <h3 class="text-2xl font-semibold text-purple-700 mb-4 border-b pb-2">Lessons (${lessons.length})</h3>
+                        <ul class="list-none space-y-3">
+                            ${lessons.map(item => `
+                                <li class="bg-purple-50 p-4 rounded-md shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-purple-200" onclick="navigate('/lessons/${item.id}')">
+                                    <span class="text-lg font-medium text-gray-800">${item.title}</span>
+                                    <span class="text-sm text-gray-500 ml-2">(Lesson in Chapter ID: ${item.bob_id})</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // --- Routing Logic ---
+
+        /**
+         * Navigates to a specific path and renders the corresponding content.
+         * Uses a simple state-based routing.
+         * @param {string} path - The path to navigate to (e.g., '/', '/courses/1/detail', '/lessons/10').
+         */
+        async function navigate(path) {
+            console.log('Navigating to:', path);
+            hideError(); // Clear error on new navigation
+
+            // Update URL hash for bookmarking/back button
+            window.location.hash = path;
+
+            if (path === '/' || path === '/courses') {
+                const courses = await fetchData('/courses/');
+                if (courses) {
+                    renderCourses(courses);
+                }
+            } else if (path.startsWith('/courses/') && path.endsWith('/detail')) {
+                const courseId = path.split('/')[2];
+                const course = await fetchData(`/courses/${courseId}/detail/`);
+                if (course) {
+                    renderCourseDetail(course);
+                }
+            } else if (path.startsWith('/lessons/')) {
+                const lessonId = path.split('/')[2];
+                const lesson = await fetchData(`/lessons/${lessonId}/`);
+                if (lesson) {
+                    renderLessonDetail(lesson);
+                }
+            } else if (path.startsWith('/search/')) {
+                const urlParams = new URLSearchParams(path.split('?')[1]);
+                const query = urlParams.get('q');
+                if (query && query.length >= 2) {
+                    const results = await fetchData(`/search/?q=${encodeURIComponent(query)}`);
+                    if (results) {
+                        renderSearchResults(results);
                     }
-                }
-            } catch (error) {
-                if (lessonsListDiv) {
-                    lessonsListDiv.innerHTML = `<p class="p-2 text-red-500">Darslarni yuklashda xato: ${error.message}</p>`;
-                }
-            }
-        }
-
-        async function renderLessonDetail(lessonId) {
-            elements.lessonTitle.textContent = 'Yuklanmoqda...';
-            elements.lessonBody.innerHTML = '';
-            elements.markCompletedBtn.classList.remove('bg-green-700', 'bg-green-500');
-            elements.markCompletedBtn.classList.add('bg-green-500');
-            elements.markCompletedBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Tugallangan';
-            elements.bookmarkBtn.classList.remove('bg-yellow-700', 'bg-yellow-500');
-            elements.bookmarkBtn.classList.add('bg-yellow-500');
-            elements.bookmarkBtn.innerHTML = '<i class="fas fa-bookmark mr-2"></i>Xatcho\'p';
-
-            try {
-                const lesson = await getLesson(lessonId);
-                elements.lessonTitle.textContent = lesson.title;
-                elements.lessonBody.innerHTML = lesson.body; // HTML kontentini ko'rsatish
-
-                // Update progress button state
-                if (lesson.is_completed) {
-                    elements.markCompletedBtn.classList.add('bg-green-700');
-                    elements.markCompletedBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Tugallangan!';
                 } else {
-                    elements.markCompletedBtn.classList.remove('bg-green-700');
-                    elements.markCompletedBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Tugallangan deb belgilash';
+                    showError('Please enter at least 2 characters for search.');
+                    navigate('/'); // Go back to home if search query is invalid
                 }
-
-                // Update bookmark button state
-                if (lesson.has_bookmark) {
-                    elements.bookmarkBtn.classList.add('bg-yellow-700');
-                    elements.bookmarkBtn.innerHTML = '<i class="fas fa-bookmark mr-2"></i>Xatcho\'p qo\'yilgan';
-                } else {
-                    elements.bookmarkBtn.classList.remove('bg-yellow-700');
-                    elements.bookmarkBtn.innerHTML = '<i class="fas fa-bookmark mr-2"></i>Xatcho\'p qo\'yish';
-                }
-
-                // Attach event listeners for actions
-                elements.markCompletedBtn.onclick = async () => {
-                    try {
-                        const result = await updateProgress({ lesson_id: lesson.id, is_completed: !lesson.is_completed, time_spent: 60 });
-                        console.log("Progress update result:", result);
-                        lesson.is_completed = !lesson.is_completed; // UI ni yangilash
-                        if (lesson.is_completed) {
-                            elements.markCompletedBtn.classList.add('bg-green-700');
-                            elements.markCompletedBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Tugallangan!';
-                        } else {
-                            elements.markCompletedBtn.classList.remove('bg-green-700');
-                            elements.markCompletedBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Tugallangan deb belgilash';
-                        }
-                        // Sidebar kurs progressini yangilash
-                        await renderCoursesSidebar();
-                        // Bob progressini yangilash (agar mavjud bo'lsa)
-                        if (currentBobId) await renderBobDetail(currentBobId);
-
-                    } catch (error) {
-                        alert('Progressni yangilashda xato: ' + error.message);
-                    }
-                };
-
-                elements.bookmarkBtn.onclick = async () => {
-                    try {
-                        const result = await toggleBookmark(lesson.id);
-                        console.log("Bookmark toggle result:", result);
-                        lesson.has_bookmark = (result.action === "added"); // UI ni yangilash
-                        if (lesson.has_bookmark) {
-                            elements.bookmarkBtn.classList.add('bg-yellow-700');
-                            elements.bookmarkBtn.innerHTML = '<i class="fas fa-bookmark mr-2"></i>Xatcho\'p qo\'yilgan';
-                        } else {
-                            elements.bookmarkBtn.classList.remove('bg-yellow-700');
-                            elements.bookmarkBtn.innerHTML = '<i class="fas fa-bookmark mr-2"></i>Xatcho\'p qo\'yish';
-                        }
-                        // Sidebar bob progressini yangilash
-                        if (currentBobId) await renderBobDetail(currentBobId);
-                    } catch (error) {
-                        alert('Xatcho\'pni o\'zgartirishda xato: ' + error.message);
-                    }
-                };
-
-                elements.noteBtn.onclick = async () => {
-                    elements.noteLessonId.value = lesson.id;
-                    elements.noteId.value = '';
-                    elements.noteContent.value = '';
-                    elements.deleteNoteBtn.classList.add('hidden'); // O'chirish tugmasini yashirish
-
-                    try {
-                        const note = await getNote(lesson.id);
-                        if (note) {
-                            elements.noteId.value = note.id;
-                            elements.noteContent.value = note.content;
-                            elements.deleteNoteBtn.classList.remove('hidden'); // Agar eslatma mavjud bo'lsa, ko'rsatish
-                        }
-                    } catch (error) {
-                        console.error("Eslatmani yuklashda xato:", error);
-                        alert("Eslatmani yuklashda xato yuz berdi: " + error.message);
-                    }
-                    elements.noteModal.classList.remove('hidden');
-                };
-
-            } catch (error) {
-                elements.lessonDetailSection.innerHTML = `<p class="text-red-500">Dars ma'lumotlarini yuklashda xato: ${error.message}</p>`;
-            }
-        }
-
-        async function renderBookmarks() {
-            elements.mainTitle.textContent = "Mening Xatcho'plarim";
-            showSection('bookmarksSection');
-            elements.bookmarksList.innerHTML = '<p class="text-gray-600">Yuklanmoqda...</p>';
-            try {
-                const bookmarks = await getBookmarks();
-                elements.bookmarksList.innerHTML = '';
-                if (bookmarks.length === 0) {
-                    elements.bookmarksList.innerHTML = '<p class="text-gray-600">Sizda hali xatcho\'plar mavjud emas.</p>';
-                    return;
-                }
-                bookmarks.forEach(lesson => {
-                    const listItem = document.createElement('li');
-                    listItem.classList.add('bg-white', 'p-4', 'rounded-md', 'shadow-sm', 'flex', 'justify-between', 'items-center', 'cursor-pointer', 'hover:bg-gray-50');
-                    listItem.innerHTML = `
-                        <div>
-                            <h3 class="font-semibold text-gray-800">${lesson.title}</h3>
-                            <p class="text-sm text-gray-500">${lesson.bob.course.title} &raquo; ${lesson.bob.title}</p>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                             ${lesson.is_completed ? '<i class="fas fa-check-circle text-green-500" title="Tugallangan"></i>' : ''}
-                             ${lesson.has_note ? '<i class="fas fa-sticky-note text-blue-500" title="Eslatma mavjud"></i>' : ''}
-                        </div>
-                    `;
-                    listItem.addEventListener('click', async () => {
-                        currentCourseId = lesson.bob.course.id;
-                        currentBobId = lesson.bob.id;
-                        currentLessonId = lesson.id;
-                        await renderLessonDetail(lesson.id);
-                        showSection('lessonDetailSection');
-                        elements.mainTitle.textContent = lesson.title;
-                    });
-                    elements.bookmarksList.appendChild(listItem);
-                });
-            } catch (error) {
-                elements.bookmarksList.innerHTML = `<p class="text-red-500">Xatcho'plarni yuklashda xato: ${error.message}</p>`;
-            }
-        }
-
-        async function renderNotes() {
-            elements.mainTitle.textContent = "Mening Eslatmalarim";
-            showSection('notesSection');
-            elements.notesList.innerHTML = '<p class="text-gray-600">Yuklanmoqda...</p>';
-            try {
-                const notes = await getUserNotes();
-                elements.notesList.innerHTML = '';
-                if (notes.length === 0) {
-                    elements.notesList.innerHTML = '<p class="text-gray-600">Sizda hali eslatmalar mavjud emas.</p>';
-                    return;
-                }
-                notes.forEach(note => {
-                    const listItem = document.createElement('li');
-                    listItem.classList.add('bg-white', 'p-4', 'rounded-md', 'shadow-sm', 'flex', 'justify-between', 'items-start', 'cursor-pointer', 'hover:bg-gray-50');
-                    listItem.innerHTML = `
-                        <div class="flex-grow pr-4">
-                            <h3 class="font-semibold text-gray-800">${note.lesson.title}</h3>
-                            <p class="text-sm text-gray-500 mb-2">${note.lesson.bob.course.title} &raquo; ${note.lesson.bob.title}</p>
-                            <p class="text-gray-700">${note.content.substring(0, 150)}${note.content.length > 150 ? '...' : ''}</p>
-                        </div>
-                        <button data-note-id="${note.id}" data-lesson-id="${note.lesson.id}" class="edit-note-btn px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600"><i class="fas fa-edit"></i></button>
-                    `;
-                    listItem.querySelector('.edit-note-btn').addEventListener('click', async (e) => {
-                        e.stopPropagation(); // List item clickni to'xtatish
-                        const noteId = e.currentTarget.dataset.noteId;
-                        const lessonId = e.currentTarget.dataset.lessonId;
-                        elements.noteLessonId.value = lessonId;
-                        elements.noteId.value = noteId;
-                        elements.deleteNoteBtn.classList.remove('hidden');
-
-                        try {
-                            const currentNote = await getNote(parseInt(lessonId)); // getNote (lesson_id) orqali to'liq eslatmani olish
-                            elements.noteContent.value = currentNote ? currentNote.content : '';
-                        } catch (error) {
-                             console.error("Eslatmani tahrirlash uchun yuklashda xato:", error);
-                             alert("Eslatmani yuklashda xato yuz berdi: " + error.message);
-                        }
-                        elements.noteModal.classList.remove('hidden');
-                    });
-                    listItem.addEventListener('click', async () => {
-                        currentCourseId = note.lesson.bob.course.id;
-                        currentBobId = note.lesson.bob.id;
-                        currentLessonId = note.lesson.id;
-                        await renderLessonDetail(note.lesson.id);
-                        showSection('lessonDetailSection');
-                        elements.mainTitle.textContent = note.lesson.title;
-                    });
-                    elements.notesList.appendChild(listItem);
-                });
-            } catch (error) {
-                elements.notesList.innerHTML = `<p class="text-red-500">Eslatmalarni yuklashda xato: ${error.message}</p>`;
-            }
-        }
-
-        async function renderSearchResults(query) {
-            elements.mainTitle.textContent = "Qidiruv Natijalari";
-            elements.searchQueryDisplay.textContent = `"${query}"`;
-            showSection('searchResultsSection');
-            elements.searchCoursesResults.innerHTML = '<li class="text-gray-600">Yuklanmoqda...</li>';
-            elements.searchBobsResults.innerHTML = '<li class="text-gray-600">Yuklanmoqda...</li>';
-            elements.searchLessonsResults.innerHTML = '<li class="text-gray-600">Yuklanmoqda...</li>';
-
-            try {
-                const results = await search(query);
-                elements.searchCoursesResults.innerHTML = '';
-                elements.searchBobsResults.innerHTML = '';
-                elements.searchLessonsResults.innerHTML = '';
-
-                if (results.courses && results.courses.length > 0) {
-                    results.courses.forEach(item => {
-                        const li = document.createElement('li');
-                        li.classList.add('p-2', 'bg-white', 'rounded-md', 'shadow-sm', 'mb-1', 'cursor-pointer', 'hover:bg-gray-50');
-                        li.textContent = item.title;
-                        li.addEventListener('click', () => {
-                            currentCourseId = item.id;
-                            currentBobId = null;
-                            currentLessonId = null;
-                            renderCourseDetail(item.id);
-                            showSection('courseDetailSection');
-                            elements.mainTitle.textContent = item.title;
-                        });
-                        elements.searchCoursesResults.appendChild(li);
-                    });
-                } else {
-                    elements.searchCoursesResults.innerHTML = '<li class="text-gray-600">Kurslarda natija topilmadi.</li>';
-                }
-
-                if (results.bobs && results.bobs.length > 0) {
-                    results.bobs.forEach(item => {
-                        const li = document.createElement('li');
-                        li.classList.add('p-2', 'bg-white', 'rounded-md', 'shadow-sm', 'mb-1', 'cursor-pointer', 'hover:bg-gray-50');
-                        li.textContent = `${item.title} (Kurs: ${item.course_id})`;
-                        li.addEventListener('click', () => {
-                            currentCourseId = item.course_id;
-                            currentBobId = item.id;
-                            currentLessonId = null;
-                            renderCourseDetail(item.course_id); // Bob kursiga o'tish
-                            // Bob detallarini ochish uchun sidebar logic qo'shish kerak bo'ladi
-                            showSection('courseDetailSection'); // Hozircha kurs sahifasiga o'tamiz
-                            elements.mainTitle.textContent = `Bob: ${item.title}`;
-                        });
-                        elements.searchBobsResults.appendChild(li);
-                    });
-                } else {
-                    elements.searchBobsResults.innerHTML = '<li class="text-gray-600">Boblarda natija topilmadi.</li>';
-                }
-
-                if (results.lessons && results.lessons.length > 0) {
-                    results.lessons.forEach(item => {
-                        const li = document.createElement('li');
-                        li.classList.add('p-2', 'bg-white', 'rounded-md', 'shadow-sm', 'mb-1', 'cursor-pointer', 'hover:bg-gray-50');
-                        li.textContent = `${item.title} (Bob: ${item.bob_id})`;
-                        li.addEventListener('click', () => {
-                            currentLessonId = item.id;
-                            renderLessonDetail(item.id);
-                            showSection('lessonDetailSection');
-                            elements.mainTitle.textContent = item.title;
-                        });
-                        elements.searchLessonsResults.appendChild(li);
-                    });
-                } else {
-                    elements.searchLessonsResults.innerHTML = '<li class="text-gray-600">Darslarda natija topilmadi.</li>';
-                }
-
-            } catch (error) {
-                elements.searchResultsSection.innerHTML = `<p class="text-red-500">Qidiruvda xato: ${error.message}</p>`;
-            }
-        }
-
-
-        // --- Admin Panel Functions ---
-        function showAdminSection(sectionId) {
-            const adminSections = [
-                elements.adminCoursesSection,
-                elements.adminBobsSection,
-                elements.adminLessonsSection
-            ];
-            adminSections.forEach(section => section.classList.add('hidden'));
-            document.getElementById(sectionId).classList.remove('hidden');
-
-            const adminNavButtons = [
-                elements.showAdminCourses,
-                elements.showAdminBobs,
-                elements.showAdminLessons
-            ];
-            adminNavButtons.forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'text-white');
-                btn.classList.add('bg-gray-200', 'text-gray-700');
-            });
-
-            if (sectionId === 'adminCoursesSection') elements.showAdminCourses.classList.replace('bg-gray-200', 'bg-blue-600');
-            if (sectionId === 'adminBobsSection') elements.showAdminBobs.classList.replace('bg-gray-200', 'bg-blue-600');
-            if (sectionId === 'adminLessonsSection') elements.showAdminLessons.classList.replace('bg-gray-200', 'bg-blue-600');
-        }
-
-        async function renderAdminCourses() {
-            elements.adminCoursesList.innerHTML = '<p class="text-gray-600">Yuklanmoqda...</p>';
-            try {
-                allCourses = await listCourses(); // Yangilangan kurslar ro'yxatini olish
-                elements.adminCoursesList.innerHTML = '';
-                allCourses.forEach(course => {
-                    const listItem = document.createElement('li');
-                    listItem.classList.add('bg-white', 'p-3', 'rounded-md', 'shadow-sm', 'flex', 'justify-between', 'items-center');
-                    listItem.innerHTML = `
-                        <span class="font-medium flex-grow truncate">${course.title}</span>
-                        <div class="space-x-2">
-                            <button data-id="${course.id}" class="edit-course-btn px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600">Tahrirlash</button>
-                        </div>
-                    `;
-                    elements.adminCoursesList.appendChild(listItem);
-                });
-            } catch (error) {
-                elements.adminCoursesList.innerHTML = `<p class="text-red-500">Kurslarni yuklashda xato: ${error.message}</p>`;
-            }
-        }
-
-        async function renderAdminBobs() {
-            elements.adminBobsList.innerHTML = '<p class="text-gray-600">Yuklanmoqda...</p>';
-            elements.adminBobCourseSelect.innerHTML = '';
-            try {
-                // Populate course dropdown
-                if (allCourses.length === 0) {
-                    allCourses = await listCourses();
-                }
-                allCourses.forEach(course => {
-                    const option = document.createElement('option');
-                    option.value = course.id;
-                    option.textContent = course.title;
-                    elements.adminBobCourseSelect.appendChild(option);
-                });
-
-                // Get bobs for selected course or all if no course selected
-                const selectedCourseId = elements.adminBobCourseSelect.value;
-                let bobsToDisplay = [];
-                if (selectedCourseId) {
-                    const courseDetail = await getCourseDetail(selectedCourseId);
-                    bobsToDisplay = courseDetail.bobs || [];
-                } else {
-                    // This scenario is problematic as there's no "list all bobs" API.
-                    // For simplicity, we'll only show bobs for selected course, or none if no course.
-                    elements.adminBobsList.innerHTML = '<p class="text-gray-600">Boblarni ko\'rish uchun kursni tanlang.</p>';
-                    return;
-                }
-
-                allBobs = bobsToDisplay; // Cache bobs
-                elements.adminBobsList.innerHTML = '';
-                if (allBobs.length === 0) {
-                    elements.adminBobsList.innerHTML = '<p class="text-gray-600">Bu kursda hali boblar mavjud emas.</p>';
-                    return;
-                }
-                allBobs.forEach(bob => {
-                    const listItem = document.createElement('li');
-                    listItem.classList.add('bg-white', 'p-3', 'rounded-md', 'shadow-sm', 'flex', 'justify-between', 'items-center');
-                    listItem.innerHTML = `
-                        <span class="font-medium flex-grow truncate">${bob.title} (Order: ${bob.order})</span>
-                        <div class="space-x-2">
-                            <button data-id="${bob.id}" class="edit-bob-btn px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600">Tahrirlash</button>
-                        </div>
-                    `;
-                    elements.adminBobsList.appendChild(listItem);
-                });
-            } catch (error) {
-                elements.adminBobsList.innerHTML = `<p class="text-red-500">Boblarni yuklashda xato: ${error.message}</p>`;
-            }
-        }
-
-        async function renderAdminLessons() {
-            elements.adminLessonsList.innerHTML = '<p class="text-gray-600">Yuklanmoqda...</p>';
-            elements.adminLessonCourseSelect.innerHTML = '';
-            elements.adminLessonBobSelect.innerHTML = '';
-
-            try {
-                // Populate course dropdown
-                if (allCourses.length === 0) {
-                    allCourses = await listCourses();
-                }
-                allCourses.forEach(course => {
-                    const option = document.createElement('option');
-                    option.value = course.id;
-                    option.textContent = course.title;
-                    elements.adminLessonCourseSelect.appendChild(option);
-                });
-
-                // Populate bob dropdown based on selected course
-                const selectedCourseId = elements.adminLessonCourseSelect.value;
-                if (selectedCourseId) {
-                    const courseDetail = await getCourseDetail(selectedCourseId);
-                    allBobs = courseDetail.bobs || []; // Cache bobs for lessons
-                    allBobs.forEach(bob => {
-                        const option = document.createElement('option');
-                        option.value = bob.id;
-                        option.textContent = bob.title;
-                        elements.adminLessonBobSelect.appendChild(option);
-                    });
-                }
-
-                const selectedBobId = elements.adminLessonBobSelect.value;
-                let lessonsToDisplay = [];
-                if (selectedBobId) {
-                    const bobDetail = await getBobDetail(selectedBobId);
-                    lessonsToDisplay = bobDetail.lessons || [];
-                } else {
-                    elements.adminLessonsList.innerHTML = '<p class="text-gray-600">Darslarni ko\'rish uchun bobni tanlang.</p>';
-                    return;
-                }
-
-                allLessons = lessonsToDisplay; // Cache lessons
-                elements.adminLessonsList.innerHTML = '';
-                if (allLessons.length === 0) {
-                    elements.adminLessonsList.innerHTML = '<p class="text-gray-600">Bu bobda hali darslar mavjud emas.</p>';
-                    return;
-                }
-                allLessons.forEach(lesson => {
-                    const listItem = document.createElement('li');
-                    listItem.classList.add('bg-white', 'p-3', 'rounded-md', 'shadow-sm', 'flex', 'justify-between', 'items-center');
-                    listItem.innerHTML = `
-                        <span class="font-medium flex-grow truncate">${lesson.title} (Order: ${lesson.order})</span>
-                        <div class="space-x-2">
-                            <button data-id="${lesson.id}" class="edit-lesson-btn px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600">Tahrirlash</button>
-                        </div>
-                    `;
-                    elements.adminLessonsList.appendChild(listItem);
-                });
-            } catch (error) {
-                elements.adminLessonsList.innerHTML = `<p class="text-red-500">Darslarni yuklashda xato: ${error.message}</p>`;
-            }
-        }
-
-        // --- Event Listeners ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            updateUserUI(); // Check initial login status
-            if (!ACCESS_TOKEN) {
-                showAuthModal(); // If not logged in, show auth modal
             } else {
-                await renderCoursesSidebar();
-                await renderCourseCards();
+                // Default to home or show a 404-like message
+                contentDiv.innerHTML = `
+                    <div class="text-center py-20">
+                        <h2 class="text-5xl font-bold text-gray-900 mb-4">404</h2>
+                        <p class="text-xl text-gray-600 mb-6">Page Not Found</p>
+                        <button onclick="navigate('/')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                            Go Home
+                        </button>
+                    </div>
+                `;
             }
+        }
 
-            // Auth Modal Events
-            elements.showLoginBtn.addEventListener('click', () => {
-                elements.loginForm.classList.remove('hidden');
-                elements.registerForm.classList.add('hidden');
-                elements.showLoginBtn.classList.add('bg-indigo-600', 'text-white');
-                elements.showLoginBtn.classList.remove('bg-gray-200', 'text-gray-700');
-                elements.showRegisterBtn.classList.add('bg-gray-200', 'text-gray-700');
-                elements.showRegisterBtn.classList.remove('bg-indigo-600', 'text-white');
-            });
-
-            elements.showRegisterBtn.addEventListener('click', () => {
-                elements.loginForm.classList.add('hidden');
-                elements.registerForm.classList.remove('hidden');
-                elements.showRegisterBtn.classList.add('bg-indigo-600', 'text-white');
-                elements.showRegisterBtn.classList.remove('bg-gray-200', 'text-gray-700');
-                elements.showLoginBtn.classList.add('bg-gray-200', 'text-gray-700');
-                elements.showLoginBtn.classList.remove('bg-indigo-600', 'text-white');
-            });
-
-            elements.loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const username = e.target.loginUsername.value;
-                const password = e.target.loginPassword.value;
-                elements.loginMessage.textContent = '';
-                try {
-                    const result = await loginUser(username, password);
-                    elements.loginMessage.textContent = 'Login muvaffaqiyatli!';
-                    elements.loginMessage.classList.remove('text-red-500');
-                    elements.loginMessage.classList.add('text-green-500');
-                    setTimeout(() => {
-                        elements.authModal.classList.add('hidden');
-                        updateUserUI();
-                        renderCoursesSidebar(); // Reload courses with progress
-                        renderCourseCards(); // Reload courses grid
-                    }, 1000);
-                } catch (error) {
-                    elements.loginMessage.textContent = 'Login xatosi: ' + error.message;
-                    elements.loginMessage.classList.remove('text-green-500');
-                    elements.loginMessage.classList.add('text-red-500');
-                }
-            });
-
-            elements.registerForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const userData = {
-                    username: e.target.registerUsername.value,
-                    email: e.target.registerEmail.value,
-                    password: e.target.registerPassword.value,
-                    first_name: e.target.registerFirstName.value,
-                    last_name: e.target.registerLastName.value,
-                };
-                elements.registerMessage.textContent = '';
-                try {
-                    const result = await registerUser(userData);
-                    elements.registerMessage.textContent = 'Ro\'yxatdan o\'tish muvaffaqiyatli! Endi login qilishingiz mumkin.';
-                    elements.registerMessage.classList.remove('text-red-500');
-                    elements.registerMessage.classList.add('text-green-500');
-                    // Avtomatik login formaga o'tish
-                    elements.showLoginBtn.click();
-                } catch (error) {
-                    elements.registerMessage.textContent = 'Ro\'yxatdan o\'tish xatosi: ' + error.message;
-                    elements.registerMessage.classList.remove('text-green-500');
-                    elements.registerMessage.classList.add('text-red-500');
-                }
-            });
-
-            // Navigation Clicks
-            document.getElementById('navCourses').addEventListener('click', (e) => {
-                e.preventDefault();
-                showSection('coursesSection');
-                elements.mainTitle.textContent = "Barcha Kurslar";
-                renderCourseCards();
-            });
-
-            document.getElementById('navBookmarks').addEventListener('click', (e) => {
-                e.preventDefault();
-                renderBookmarks();
-            });
-
-            document.getElementById('navNotes').addEventListener('click', (e) => {
-                e.preventDefault();
-                renderNotes();
-            });
-
-            elements.navLogin.addEventListener('click', (e) => {
-                e.preventDefault();
-                showAuthModal();
-            });
-
-            elements.navLogout.addEventListener('click', (e) => {
-                e.preventDefault();
-                logoutUser();
-            });
-
-            elements.navAdminPanel.addEventListener('click', (e) => {
-                e.preventDefault();
-                elements.adminPanelModal.classList.remove('hidden');
-                showAdminSection('adminCoursesSection');
-                renderAdminCourses();
-            });
-
-            // Note Modal Save/Delete
-            elements.saveNoteBtn.addEventListener('click', async () => {
-                const lessonId = elements.noteLessonId.value;
-                const noteId = elements.noteId.value;
-                const content = elements.noteContent.value;
-                elements.noteMessage.textContent = '';
-
-                if (!content.trim()) {
-                    elements.noteMessage.textContent = "Eslatma matni bo'sh bo'lishi mumkin emas.";
-                    elements.noteMessage.classList.add('text-red-500');
-                    return;
-                }
-
-                try {
-                    if (noteId) { // Update existing note
-                        const result = await updateNote(noteId, { content: content });
-                        elements.noteMessage.textContent = "Eslatma muvaffaqiyatli yangilandi!";
-                    } else { // Create new note
-                        const result = await createNote({ lesson_id: parseInt(lessonId), content: content });
-                        elements.noteMessage.textContent = "Eslatma muvaffaqiyatli yaratildi!";
-                        elements.noteId.value = result.id; // Yangi ID ni saqlash
-                        elements.deleteNoteBtn.classList.remove('hidden');
-                    }
-                    elements.noteMessage.classList.remove('text-red-500');
-                    elements.noteMessage.classList.add('text-green-500');
-                    setTimeout(() => {
-                        elements.noteModal.classList.add('hidden');
-                        // Dars detallarini va umumiy eslatmalar ro'yxatini yangilash
-                        if (currentLessonId) renderLessonDetail(currentLessonId);
-                        renderNotes();
-                    }, 1000);
-                } catch (error) {
-                    elements.noteMessage.textContent = 'Eslatmani saqlashda xato: ' + error.message;
-                    elements.noteMessage.classList.remove('text-green-500');
-                    elements.noteMessage.classList.add('text-red-500');
-                }
-            });
-
-            elements.deleteNoteBtn.addEventListener('click', async () => {
-                const noteId = elements.noteId.value;
-                if (!confirm("Haqiqatan ham ushbu eslatmani o'chirmoqchimisiz?")) {
-                    return;
-                }
-                elements.noteMessage.textContent = '';
-                try {
-                    await deleteNote(noteId);
-                    elements.noteMessage.textContent = "Eslatma muvaffaqiyatli o'chirildi!";
-                    elements.noteMessage.classList.remove('text-red-500');
-                    elements.noteMessage.classList.add('text-green-500');
-                    setTimeout(() => {
-                        elements.noteModal.classList.add('hidden');
-                        if (currentLessonId) renderLessonDetail(currentLessonId);
-                        renderNotes();
-                    }, 1000);
-                } catch (error) {
-                    elements.noteMessage.textContent = 'Eslatmani o\'chirishda xato: ' + error.message;
-                    elements.noteMessage.classList.remove('text-green-500');
-                    elements.noteMessage.classList.add('text-red-500');
-                }
-            });
-
-            // Search functionality
-            elements.searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    const query = elements.searchInput.value.trim();
-                    if (query.length > 1) {
-                        renderSearchResults(query);
-                    } else {
-                        alert("Qidiruv so'rovi kamida 2 ta belgidan iborat bo'lishi kerak.");
-                    }
-                }
-            });
-
-            // Admin Panel Navigation
-            elements.showAdminCourses.addEventListener('click', () => {
-                showAdminSection('adminCoursesSection');
-                renderAdminCourses();
-            });
-            elements.showAdminBobs.addEventListener('click', () => {
-                showAdminSection('adminBobsSection');
-                renderAdminBobs();
-            });
-            elements.showAdminLessons.addEventListener('click', () => {
-                showAdminSection('adminLessonsSection');
-                renderAdminLessons();
-            });
-
-            // Admin Add Buttons
-            elements.addCourseBtn.addEventListener('click', () => {
-                elements.courseEditorModal.classList.remove('hidden');
-                elements.courseEditorTitle.textContent = "Yangi kurs qo'shish";
-                elements.courseEditorForm.reset(); // Reset form
-                elements.editCourseId.value = '';
-                elements.deleteCourseBtn.classList.add('hidden'); // Hide delete for new
-            });
-            elements.addBobBtn.addEventListener('click', () => {
-                elements.bobEditorModal.classList.remove('hidden');
-                elements.bobEditorTitle.textContent = "Yangi bob qo'shish";
-                elements.bobEditorForm.reset();
-                elements.editBobId.value = '';
-                elements.deleteBobBtn.classList.add('hidden');
-                // Populate course select for new bob
-                elements.editBobCourse.innerHTML = '';
-                allCourses.forEach(course => {
-                    const option = document.createElement('option');
-                    option.value = course.id;
-                    option.textContent = course.title;
-                    elements.editBobCourse.appendChild(option);
-                });
-            });
-            elements.addLessonBtn.addEventListener('click', async () => {
-                elements.lessonEditorModal.classList.remove('hidden');
-                elements.lessonEditorTitle.textContent = "Yangi dars qo'shish";
-                elements.lessonEditorForm.reset();
-                elements.editLessonId.value = '';
-                elements.deleteLessonBtn.classList.add('hidden');
-                // Populate course and bob selects for new lesson
-                await populateLessonCourseBobSelects();
-            });
-
-            // Admin Editor Form Submissions
-            elements.courseEditorForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const courseId = elements.editCourseId.value;
-                const courseData = {
-                    title: elements.editCourseTitle.value,
-                    body: elements.editCourseBody.value,
-                    is_active: elements.editCourseIsActive.checked
-                };
-                try {
-                    if (courseId) {
-                        await updateCourse(courseId, courseData);
-                        alert('Kurs muvaffaqiyatli yangilandi!');
-                    } else {
-                        await createCourse(courseData);
-                        alert('Kurs muvaffaqiyatli yaratildi!');
-                    }
-                    elements.courseEditorModal.classList.add('hidden');
-                    renderAdminCourses(); // Admin panelini yangilash
-                    renderCoursesSidebar(); // Sidebar kurslarini yangilash
-                    renderCourseCards(); // Asosiy sahifa kurslarini yangilash
-                } catch (error) {
-                    alert('Kursni saqlashda xato: ' + error.message);
-                    console.error('Kursni saqlashda xato:', error);
-                }
-            });
-
-            elements.bobEditorForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const bobId = elements.editBobId.value;
-                const bobData = {
-                    course_id: parseInt(elements.editBobCourse.value),
-                    title: elements.editBobTitle.value,
-                    order: parseInt(elements.editBobOrder.value),
-                    is_active: elements.editBobIsActive.checked
-                };
-                try {
-                    if (bobId) {
-                        await updateBob(bobId, bobData);
-                        alert('Bob muvaffaqiyatli yangilandi!');
-                    } else {
-                        await createBob(bobData);
-                        alert('Bob muvaffaqiyatli yaratildi!');
-                    }
-                    elements.bobEditorModal.classList.add('hidden');
-                    renderAdminBobs();
-                    // Boblar va darslar ko'rinishini yangilash kerak
-                    if (currentCourseId) await renderCourseDetail(currentCourseId);
-                } catch (error) {
-                    alert('Bobni saqlashda xato: ' + error.message);
-                    console.error('Bobni saqlashda xato:', error);
-                }
-            });
-
-            elements.lessonEditorForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const lessonId = elements.editLessonId.value;
-                const lessonData = {
-                    bob_id: parseInt(elements.editLessonBob.value),
-                    title: elements.editLessonTitle.value,
-                    body: elements.editLessonBody.value,
-                    order: parseInt(elements.editLessonOrder.value),
-                    estimated_reading_time: parseInt(elements.editLessonEstimatedReadingTime.value) || 0,
-                    is_active: elements.editLessonIsActive.checked
-                };
-                try {
-                    if (lessonId) {
-                        await updateLesson(lessonId, lessonData);
-                        alert('Dars muvaffaqiyatli yangilandi!');
-                    } else {
-                        await createLesson(lessonData);
-                        alert('Dars muvaffaqiyatli yaratildi!');
-                    }
-                    elements.lessonEditorModal.classList.add('hidden');
-                    renderAdminLessons();
-                    if (currentBobId) await renderBobDetail(currentBobId);
-                } catch (error) {
-                    alert('Darsni saqlashda xato: ' + error.message);
-                    console.error('Darsni saqlashda xato:', error);
-                }
-            });
-
-            // Admin Edit Buttons (Delegated event handling)
-            elements.adminCoursesList.addEventListener('click', async (e) => {
-                if (e.target.classList.contains('edit-course-btn')) {
-                    const courseId = e.target.dataset.id;
-                    try {
-                        const course = await getCourse(courseId);
-                        elements.courseEditorModal.classList.remove('hidden');
-                        elements.courseEditorTitle.textContent = "Kursni tahrirlash";
-                        elements.editCourseId.value = course.id;
-                        elements.editCourseTitle.value = course.title;
-                        elements.editCourseBody.value = course.body;
-                        elements.editCourseIsActive.checked = course.is_active;
-                        elements.deleteCourseBtn.classList.remove('hidden');
-                    } catch (error) {
-                        alert('Kursni yuklashda xato: ' + error.message);
-                    }
-                }
-            });
-
-            elements.adminBobsList.addEventListener('click', async (e) => {
-                if (e.target.classList.contains('edit-bob-btn')) {
-                    const bobId = e.target.dataset.id;
-                    try {
-                        const bob = await getBobDetail(bobId);
-                        elements.bobEditorModal.classList.remove('hidden');
-                        elements.bobEditorTitle.textContent = "Bobni tahrirlash";
-                        elements.editBobId.value = bob.id;
-                        elements.editBobTitle.value = bob.title;
-                        elements.editBobOrder.value = bob.order;
-                        elements.editBobIsActive.checked = bob.is_active;
-                        elements.deleteBobBtn.classList.remove('hidden');
-
-                        // Populate course select and set current course
-                        elements.editBobCourse.innerHTML = '';
-                        if (allCourses.length === 0) allCourses = await listCourses();
-                        allCourses.forEach(course => {
-                            const option = document.createElement('option');
-                            option.value = course.id;
-                            option.textContent = course.title;
-                            elements.editBobCourse.appendChild(option);
-                        });
-                        elements.editBobCourse.value = bob.course.id; // bob.course obyekti qaytadi
-                    } catch (error) {
-                        alert('Bobni yuklashda xato: ' + error.message);
-                    }
-                }
-            });
-
-            elements.adminLessonsList.addEventListener('click', async (e) => {
-                if (e.target.classList.contains('edit-lesson-btn')) {
-                    const lessonId = e.target.dataset.id;
-                    try {
-                        const lesson = await getLesson(lessonId);
-                        elements.lessonEditorModal.classList.remove('hidden');
-                        elements.lessonEditorTitle.textContent = "Darsni tahrirlash";
-                        elements.editLessonId.value = lesson.id;
-                        elements.editLessonTitle.value = lesson.title;
-                        elements.editLessonBody.value = lesson.body;
-                        elements.editLessonOrder.value = lesson.order;
-                        elements.editLessonEstimatedReadingTime.value = lesson.estimated_reading_time;
-                        elements.editLessonIsActive.checked = lesson.is_active;
-                        elements.deleteLessonBtn.classList.remove('hidden');
-
-                        await populateLessonCourseBobSelects(lesson.bob.course.id, lesson.bob.id);
-
-                    } catch (error) {
-                        alert('Darsni yuklashda xato: ' + error.message);
-                    }
-                }
-            });
-
-            // Admin Delete Buttons
-            elements.deleteCourseBtn.addEventListener('click', async () => {
-                const courseId = elements.editCourseId.value;
-                if (!confirm("Haqiqatan ham ushbu kursni o'chirmoqchimisiz?")) return;
-                try {
-                    await deleteCourse(courseId);
-                    alert('Kurs muvaffaqiyatli o\'chirildi!');
-                    elements.courseEditorModal.classList.add('hidden');
-                    renderAdminCourses();
-                    renderCoursesSidebar();
-                    renderCourseCards();
-                } catch (error) {
-                    alert('Kursni o\'chirishda xato: ' + error.message);
-                }
-            });
-
-            elements.deleteBobBtn.addEventListener('click', async () => {
-                const bobId = elements.editBobId.value;
-                if (!confirm("Haqiqatan ham ushbu bobni o'chirmoqchimisiz?")) return;
-                try {
-                    await deleteBob(bobId);
-                    alert('Bob muvaffaqiyatli o\'chirildi!');
-                    elements.bobEditorModal.classList.add('hidden');
-                    renderAdminBobs();
-                    if (currentCourseId) await renderCourseDetail(currentCourseId);
-                } catch (error) {
-                    alert('Bobni o\'chirishda xato: ' + error.message);
-                }
-            });
-
-            elements.deleteLessonBtn.addEventListener('click', async () => {
-                const lessonId = elements.editLessonId.value;
-                if (!confirm("Haqiqatan ham ushbu darsni o'chirmoqchimisiz?")) return;
-                try {
-                    await deleteLesson(lessonId);
-                    alert('Dars muvaffaqiyatli o\'chirildi!');
-                    elements.lessonEditorModal.classList.add('hidden');
-                    renderAdminLessons();
-                    if (currentBobId) await renderBobDetail(currentBobId);
-                } catch (error) {
-                    alert('Darsni o\'chirishda xato: ' + error.message);
-                }
-            });
-
-            // Logic to populate lesson course/bob selects dynamically
-            async function populateLessonCourseBobSelects(selectedCourse = null, selectedBob = null) {
-                elements.editLessonCourse.innerHTML = '';
-                elements.editLessonBob.innerHTML = '';
-
-                if (allCourses.length === 0) {
-                    allCourses = await listCourses();
-                }
-                allCourses.forEach(course => {
-                    const option = document.createElement('option');
-                    option.value = course.id;
-                    option.textContent = course.title;
-                    elements.editLessonCourse.appendChild(option);
-                });
-
-                if (selectedCourse) {
-                    elements.editLessonCourse.value = selectedCourse;
-                }
-                
-                // Trigger change to populate bobs for the initial selected course
-                const initialCourseIdForLessons = elements.editLessonCourse.value;
-                if (initialCourseIdForLessons) {
-                    const courseDetail = await getCourseDetail(initialCourseIdForLessons);
-                    allBobs = courseDetail.bobs || [];
-                    allBobs.forEach(bob => {
-                        const option = document.createElement('option');
-                        option.value = bob.id;
-                        option.textContent = bob.title;
-                        elements.editLessonBob.appendChild(option);
-                    });
-                }
-                if (selectedBob) {
-                    elements.editLessonBob.value = selectedBob;
-                }
+        /**
+         * Handles the search functionality when the search button is clicked or Enter is pressed.
+         */
+        function handleSearch() {
+            const query = searchInput.value.trim();
+            if (query) {
+                navigate(`/search/?q=${query}`);
+            } else {
+                showError('Please enter a search term.');
             }
+        }
 
-            elements.adminLessonCourseSelect.addEventListener('change', renderAdminLessons);
-            elements.adminLessonBobSelect.addEventListener('change', renderAdminLessons);
+        // --- Initial Load and Event Listeners ---
 
-            elements.editLessonCourse.addEventListener('change', async () => {
-                const courseId = elements.editLessonCourse.value;
-                elements.editLessonBob.innerHTML = ''; // Clear existing bobs
-                if (courseId) {
-                    const courseDetail = await getCourseDetail(courseId);
-                    allBobs = courseDetail.bobs || [];
-                    allBobs.forEach(bob => {
-                        const option = document.createElement('option');
-                        option.value = bob.id;
-                        option.textContent = bob.title;
-                        elements.editLessonBob.appendChild(option);
-                    });
-                }
-            });
-
-            elements.adminBobCourseSelect.addEventListener('change', renderAdminBobs);
-
+        // Listen for hash changes to enable back/forward button navigation
+        window.addEventListener('hashchange', () => {
+            const path = window.location.hash.slice(1) || '/'; // Remove '#' and default to '/'
+            navigate(path);
         });
+
+        // Initial page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialPath = window.location.hash.slice(1) || '/';
+            navigate(initialPath);
+        });
+
     </script>
 </body>
 </html>

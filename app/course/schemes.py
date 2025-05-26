@@ -37,9 +37,6 @@ class CourseSchema(Schema):
     slug: str
     body: str
     image: str
-    total_lessons: int
-    completed_lessons: Optional[int] = 0
-    progress_percentage: Optional[float] = 0.0
     created_at: datetime
     updated_at: datetime
 
@@ -56,41 +53,4 @@ class CourseDetailSchema(Schema):
     created_at: datetime
     updated_at: datetime
 
-# Request Schemas
-class ProgressUpdateSchema(Schema):
-    lesson_id: int
-    is_completed: bool
-    time_spent: Optional[int] = 0
 
-class BookmarkSchema(Schema):
-    lesson_id: int
-
-class NoteCreateSchema(Schema):
-    lesson_id: int
-    content: str
-
-class NoteUpdateSchema(Schema):
-    content: str
-
-class NoteResponseSchema(Schema):
-    id: int
-    lesson_id: int
-    content: str
-    created_at: datetime
-    updated_at: datetime
-
-# User Schemas
-class UserCreateSchema(Schema):
-    username: str
-    email: str
-    password: str
-    first_name: Optional[str] = ""
-    last_name: Optional[str] = ""
-
-class UserSchema(Schema):
-    id: int
-    username: str
-    email: str
-    first_name: str
-    last_name: str
-    date_joined: datetime

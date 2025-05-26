@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Course, Bob, Lesson, UserProgress, Bookmark, Note
-
+from .models import Course, Bob, Lesson
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display = ['title', 'slug', 'is_active', 'created_at']
@@ -25,21 +24,3 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = ['title', 'bob', 'order', 'estimated_reading_time', 'is_active', 'created_at']
     list_filter = ['bob__course', 'bob', 'is_active', 'created_at']
     search_fields = ['title', 'body', 'bob__title']
-
-@admin.register(UserProgress)
-class UserProgressAdmin(admin.ModelAdmin):
-    list_display = ['user', 'lesson', 'is_completed', 'completion_date', 'time_spent']
-    list_filter = ['is_completed', 'completion_date', 'lesson__bob__course']
-    search_fields = ['user__username', 'lesson__title']
-
-@admin.register(Bookmark)
-class BookmarkAdmin(admin.ModelAdmin):
-    list_display = ['user', 'lesson', 'created_at']
-    list_filter = ['created_at', 'lesson__bob__course']
-    search_fields = ['user__username', 'lesson__title']
-
-@admin.register(Note)
-class NoteAdmin(admin.ModelAdmin):
-    list_display = ['user', 'lesson', 'created_at', 'updated_at']
-    list_filter = ['created_at', 'lesson__bob__course']
-    search_fields = ['user__username', 'lesson__title', 'content']

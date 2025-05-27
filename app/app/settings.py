@@ -15,7 +15,7 @@ SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str, default=get_random_secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DJANGO_DEBUG", cast=bool, default=True)
 # DEBUG = True
-ALLOWED_HOSTS = [".darslik.onrender.com", "localhost", "127.0.0.1", "0.0.0.0"]  # in production
+ALLOWED_HOSTS = [".darslik.onrender.com", "localhost", "127.0.0.1", "0.0.0.0", "darslik.onrender.com"]  # in production
 CSRF_TRUSTED_ORIGINS = [
     "https://darslik.onrender.com",
     "https://*.railway.app", 
@@ -241,12 +241,16 @@ CKEDITOR_BROWSE_SHOW_DIRS = True  # Papkalarni ko'rish
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 STORAGES = {
     "default": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {
+            "location": BASE_DIR / "media",  # media fayllar saqlanadigan papka
+            "base_url": "/media/",          # media fayllarga URL
+        },
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-# De

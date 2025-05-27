@@ -148,6 +148,8 @@ def get_bob_detail(request, bob_id: int):
 
 
 # --- Darslar bo'yicha endpointlar ---
+def absolutify_images(request, body):
+    return body.replace("src=\"/", f"src=\"{request.build_absolute_uri('/')}")
 
 @api.get("/lessons/{lesson_id}/", response=LessonSchema)
 def get_lesson(request, lesson_id: int):
@@ -156,7 +158,7 @@ def get_lesson(request, lesson_id: int):
     return {
         "id": lesson.id,
         "title": lesson.title,
-        "body": lesson.body,
+        "body": absolutify_images(request, lesson.body),
         "estimated_reading_time": lesson.estimated_reading_time,
         "is_active": lesson.is_active,
         "created_at": lesson.created_at,

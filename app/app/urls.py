@@ -7,7 +7,7 @@ from users.urls import urlpatterns as users_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", include("course.urls")),
+    # path("", include("course.urls")),
     path("api/", api.urls),
     path("ckeditor/", include("ckeditor_uploader.urls")),
     path("users/", include(users_urls)),
@@ -15,3 +15,13 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+from django.http import JsonResponse
+
+def health_check(request):
+    return JsonResponse({"status": "ok"})
+
+urlpatterns += [
+    path('health/', health_check, name='health_check'),
+]

@@ -4,5 +4,4 @@ from .views import home, lesson
 
 urlpatterns = [
     path("", home, name="home"),
-    path("<slug:slug>/", lesson, name='lesson'),
 ]

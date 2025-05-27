@@ -13,9 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str, default=get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DJANGO_DEBUG", cast=bool, default=True)
-# DEBUG = True
-ALLOWED_HOSTS = [".darslik.onrender.com", "localhost", "127.0.0.1", "0.0.0.0", "darslik.onrender.com"]  # in production
+# DEBUG = config("DJANGO_DEBUG", cast=bool, default=True)
+DEBUG = True
+ALLOWED_HOSTS = ["*.darslik.onrender.com", "localhost", "127.0.0.1", "0.0.0.0", "darslik.onrender.com"]  # in production
 CSRF_TRUSTED_ORIGINS = [
     "https://darslik.onrender.com",
     "https://*.railway.app", 
@@ -45,9 +45,8 @@ INSTALLED_APPS = [
     "users"
 ]
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 # Cookie xavfsizligi
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
@@ -85,7 +84,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
+WHITENOISE_ALLOW_ALL = True
+DISABLE_COLLECTSTATIC=0
+WHITENOISE_MAX_AGE = 86400
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -103,7 +104,10 @@ DATABASES = {
 
 
 
-CORS_ALLOW_ALL_ORIGINS=True
+CORS_ALLOWED_ORIGINS = [
+    "https://darslik.onrender.com",
+    "https://*.railway.app",
+]
 
 ROOT_URLCONF = 'app.urls'
 
@@ -200,7 +204,7 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 STATICFILES_DIRS = [

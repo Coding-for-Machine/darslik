@@ -270,7 +270,21 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('lesson-title').textContent = lesson.title;
             document.getElementById('lesson-time').textContent = lesson.estimated_reading_time || 0;
             document.getElementById('lesson-updated').textContent = formatDate(lesson.updated_at);
-            document.getElementById('lesson-content').innerHTML = lesson.body || '<p class="text-gray-500">Mazmuni mavjud emas</p>';
+            let contentHtml = lesson.body || '<p class="text-gray-500">Mazmuni mavjud emas</p>';
+            console.log("lesson url", lesson.pdf_url)
+            if (lesson.pdf_url) {
+                contentHtml += `
+                    <h2 class="mt-4 text-xl font-semibold">Mavzu bo'yicha PDF fayl:</h2>
+                    <div class="pdf-viewer mt-2">
+                        <iframe src="${lesson.pdf_url}" width="100%" height="600px" style="border: none;">
+                            Brauzeringiz PDF fayllarni ko'rsatishni qo'llab-quvvatlamaydi. 
+                            <a href="${lesson.pdf_url}" target="_blank" rel="noopener noreferrer">PDFni yuklab oling</a>.
+                        </iframe>
+                    </div>
+                `;
+            }
+
+            document.getElementById('lesson-content').innerHTML = contentHtml
             
             // Switch sections
             hideAllSections();

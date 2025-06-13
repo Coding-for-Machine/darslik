@@ -8,6 +8,7 @@ from typing import List, Optional
 from ninja_extra import NinjaExtraAPI
 from datetime import datetime
 from pydantic import BaseModel
+from typing import Optional
 
 # Modellar import qilinadi
 from .models import Course, Bob, Lesson
@@ -25,7 +26,28 @@ api.register_controllers(NinjaJWTDefaultController)
 
 
 # --- Kurslar bo'yicha endpointlar ---
+class LessonSchema(BaseModel):
+    id: int
+    title: str
+    body: str
+    estimated_reading_time: int
+    pdf_url: Optional[str]=None # O'zgargan nom
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
 
+
+class BobDetailSchema(BaseModel):
+    id: int
+    title: str
+    lessons: List[LessonSchema]
+class CourseDetailSchema(BaseModel):
+    id: int
+    title: str
+    slug: str
+    body: str
+    image: str
+    bobs: List[BobDetailSchema]
 """
 class CourseSchema(Schema):
     id: int
@@ -78,13 +100,16 @@ class LessonSchema(BaseModel):
     title: str
     body: str
     estimated_reading_time: int
+    pdf_url: Optional[str]=None # O'zgargan nom
     is_active: bool
     created_at: datetime
     updated_at: datetime
+
 class BobDetailSchema(BaseModel):
     id: int
     title: str
     lessons: List[LessonSchema]
+
 class CourseDetailSchema(BaseModel):
     id: int
     title: str
@@ -112,6 +137,7 @@ def get_course_detail(request, course_id: int):
                         "title": lesson.title,
                         "body": lesson.body,
                         "estimated_reading_time": lesson.estimated_reading_time,
+                        "pdf_url": request.build_absolute_uri(lesson.pdf_fayl.url) if lesson.pdf_fayl else None, # O'zgargan qator
                         "is_active": lesson.is_active,
                         "created_at": lesson.created_at,
                         "updated_at": lesson.updated_at
@@ -122,8 +148,6 @@ def get_course_detail(request, course_id: int):
             for bob in course.bobs.filter(is_active=True).order_by('order')
         ]
     }
-
-# --- Boblar bo'yicha endpointlar ---
 
 @api.get("/bobs/{bob_id}/", response=BobDetailSchema)
 def get_bob_detail(request, bob_id: int):
@@ -138,6 +162,7 @@ def get_bob_detail(request, bob_id: int):
                 "title": lesson.title,
                 "body": lesson.body,
                 "estimated_reading_time": lesson.estimated_reading_time,
+                "pdf_url": request.build_absolute_uri(lesson.pdf_fayl.url) if lesson.pdf_fayl else None, # O'zgargan qator
                 "is_active": lesson.is_active,
                 "created_at": lesson.created_at,
                 "updated_at": lesson.updated_at
@@ -145,7 +170,6 @@ def get_bob_detail(request, bob_id: int):
             for lesson in lessons
         ]
     }
-
 
 # --- Darslar bo'yicha endpointlar ---
 def absolutify_images(request, body):
@@ -155,15 +179,21 @@ def absolutify_images(request, body):
 def get_lesson(request, lesson_id: int):
     lesson = get_object_or_404(Lesson, id=lesson_id, is_active=True)
 
+    pdf_url = None
+    if lesson.pdf_fayl and hasattr(lesson.pdf_fayl, 'url'):
+        pdf_url = request.build_absolute_uri(lesson.pdf_fayl.url)
+
     return {
         "id": lesson.id,
         "title": lesson.title,
         "body": absolutify_images(request, lesson.body),
         "estimated_reading_time": lesson.estimated_reading_time,
+        "pdf_url": pdf_url, # Bu yerda .url atributini ishlating va absolutify_images kabi absolutify qiling
         "is_active": lesson.is_active,
         "created_at": lesson.created_at,
         "updated_at": lesson.updated_at
     }
+
 @api.get("/search/", response=List[CourseSchema])
 def search(request, q: str = Query(..., min_length=2)):
     """

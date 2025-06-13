@@ -51,6 +51,7 @@ class Lesson(models.Model):
     title = models.CharField(max_length=200, verbose_name="Dars nomi", blank=True)
     body = RichTextField(verbose_name="Dars matni")
     order = models.PositiveIntegerField(default=0, verbose_name="Tartib")
+    pdf_fayl = models.FileField(upload_to="lesson/", null=True, blank=True)
     is_active = models.BooleanField(default=True, verbose_name="Faol")
     estimated_reading_time = models.PositiveIntegerField(default=5, verbose_name="O'qish vaqti (daqiqa)")
     created_at = models.DateTimeField(auto_now_add=True)

@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('lesson-updated').textContent = formatDate(lesson.updated_at);
             let contentHtml = lesson.body || '<p class="text-gray-500">Mazmuni mavjud emas</p>';
             console.log("lesson url", lesson.pdf_url)
-            if (lesson.pdf_url) {
+            // if (lesson.pdf_url) {
                 contentHtml += `
                     <h2 class="mt-4 text-xl font-semibold">Mavzu bo'yicha PDF fayl:</h2>
                     <div class="pdf-viewer mt-2">
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </iframe>
                     </div>
                 `;
-            }
+            // }
 
             document.getElementById('lesson-content').innerHTML = contentHtml
             
